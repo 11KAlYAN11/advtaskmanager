@@ -36,6 +36,9 @@ build/
 .env
 .env.local
 .env.*.local
+# allow .env.production (just a URL, no secrets)
+!.env.production
+!frontend/.env.production
 src/main/resources/application-prod.properties
 
 ### Frontend ###
