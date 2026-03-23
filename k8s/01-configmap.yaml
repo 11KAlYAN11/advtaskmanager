@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: taskmanager-config
+  namespace: taskmanager
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  DB_URL: "jdbc:postgresql://postgres-service:5432/taskmanager"
+  DB_USERNAME: "postgres"
+  AI_BASE_URL: "https://api.groq.com/openai/v1/chat/completions"
+  AI_MODEL: "llama-3.3-70b-versatile"
+

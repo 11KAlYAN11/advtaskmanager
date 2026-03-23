@@ -1,0 +1,56 @@
+# ════════════════════════════════════════════════════════════════════════════
+#  Ingress — expose app to internet via a single entry point
+#  Requires: kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/...
+#            OR AWS ALB / GCP Load Balancer in cloud
+# ════════════════════════════════════════════════════════════════════════════
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: taskmanager-ingress
+  namespace: taskmanager
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "10"
+    # Rate limiting — 100 req/s per IP
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    # TLS redirect
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # CORS (handled by backend, but also enforce at ingress)
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+spec:
+  ingressClassName: nginx
+  # TLS — replace with your domain + cert-manager ClusterIssuer
+  # tls:
+  #   - hosts:
+  #       - taskmanager.yourdomain.com
+  #     secretName: taskmanager-tls
+  rules:
+    - host: taskmanager.yourdomain.com    # replace with your domain
+      http:
+        paths:
+          # All /api/* → backend
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: backend-service
+                port:
+                  number: 8080
+          # All /actuator/* → backend (internal — restrict in prod)
+          - path: /actuator
+            pathType: Prefix
+            backend:
+              service:
+                name: backend-service
+                port:
+                  number: 8080
+          # Everything else → frontend (React SPA)
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 80
+

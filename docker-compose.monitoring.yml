@@ -1,0 +1,90 @@
+version: "3.9"
+
+# ════════════════════════════════════════════════════════════════════════════
+#  Monitoring Stack — Prometheus + Grafana + Exporters
+#  Usage:
+#    docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
+#
+#  Access:
+#    Prometheus : http://localhost:9090
+#    Grafana    : http://localhost:3000  (admin / admin123)
+# ════════════════════════════════════════════════════════════════════════════
+
+networks:
+  app-network:
+    external: true    # reuses network from docker-compose.yml
+
+volumes:
+  prometheus-data:
+  grafana-data:
+
+services:
+
+  # ── Prometheus ──────────────────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: taskmanager-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+
+  # ── Grafana ──────────────────────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:latest
+    container_name: taskmanager-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - app-network
+
+  # ── Node Exporter (host CPU / RAM / Disk metrics) ────────────────────────────
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: taskmanager-node-exporter
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - "9100:9100"
+    networks:
+      - app-network
+
+  # ── PostgreSQL Exporter ───────────────────────────────────────────────────────
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: taskmanager-postgres-exporter
+    restart: unless-stopped
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:${DB_PASSWORD:-taskmanager123}@postgres:5432/taskmanager?sslmode=disable"
+    ports:
+      - "9187:9187"
+    depends_on:
+      - prometheus
+    networks:
+      - app-network
+

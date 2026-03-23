@@ -1,0 +1,109 @@
+.task-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+  cursor: grab;
+  user-select: none;        /* prevent text selection while dragging */
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.task-card:active {
+  cursor: grabbing;
+}
+
+/* ── Card is being dragged ─────────────────────────────────────────────────── */
+.task-card.dragging {
+  opacity: 0.35;
+  transform: scale(0.97) rotate(1deg);
+  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.35);
+  cursor: grabbing;
+}
+
+/* ── Drag handle icon ─────────────────────────────────────────────────────── */
+.drag-handle {
+  font-size: 1.1rem;
+  color: #bbb;
+  cursor: grab;
+  padding-right: 6px;
+  flex-shrink: 0;
+  letter-spacing: -2px;
+}
+
+.task-card:hover .drag-handle {
+  color: #667eea;
+}
+
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.task-header h4 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.delete-btn-small {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.delete-btn-small:hover {
+  background: #c82333;
+}
+
+.description {
+  color: #666;
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.task-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.task-meta label {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.task-meta select {
+  padding: 6px 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.assigned-user {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: #e7f3ff;
+  color: #0d6efd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+

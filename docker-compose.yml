@@ -1,0 +1,86 @@
+version: "3.9"
+
+# ════════════════════════════════════════════════════════════════════════════
+#  Advanced Task Manager — Full Stack Docker Compose
+#  Usage:
+#    docker compose up -d          # start everything
+#    docker compose logs -f        # follow logs
+#    docker compose down -v        # stop + remove volumes
+# ════════════════════════════════════════════════════════════════════════════
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+
+services:
+
+  # ── PostgreSQL ─────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: taskmanager-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: taskmanager
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-taskmanager123}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d taskmanager"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ── Spring Boot Backend ───────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taskmanager-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://postgres:5432/taskmanager
+      DB_USERNAME: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-taskmanager123}
+      JWT_SECRET: ${JWT_SECRET:-advTaskManagerJWTSecretKeyForAuthentication2024LongEnoughForHS256}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-your-groq-key-here}
+      AI_BASE_URL: ${AI_BASE_URL:-https://api.groq.com/openai/v1/chat/completions}
+      AI_MODEL: ${AI_MODEL:-llama-3.3-70b-versatile}
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ── React Frontend (Nginx) ────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: taskmanager-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+
