@@ -26,6 +26,9 @@ FROM eclipse-temurin:17-jre-alpine AS runtime
 
 WORKDIR /app
 
+# Always use prod profile in container (Railway/Docker deployments)
+ENV SPRING_PROFILES_ACTIVE=prod
+
 # Create non-root user (security best practice)
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
