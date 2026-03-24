@@ -1,46 +1,80 @@
 .create-user-form {
-  margin-bottom: 30px;
+  margin-bottom: 24px;
   padding: 20px;
   background: #f8f9fa;
-  border-radius: 10px;
+  border-radius: 14px;
+  border: 1px solid #e9ecef;
 }
 
 .create-user-form h2 {
-  margin-bottom: 20px;
-  color: #333;
+  margin-bottom: 16px;
+  color: #1a1a2e;
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
 .create-user-form form {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  align-items: flex-end;
 }
 
 .create-user-form input,
 .create-user-form select {
-  padding: 10px 15px;
-  border: 2px solid #dee2e6;
-  border-radius: 8px;
-  font-size: 1rem;
+  padding: 11px 14px;
+  border: 1.5px solid #dee2e6;
+  border-radius: 10px;
+  font-size: 0.95rem;
   flex: 1;
-  min-width: 150px;
+  min-width: 140px;
+  background: #ffffff;        /* explicit white */
+  color: #1a1a2e;             /* explicit dark text */
+  color-scheme: light;        /* no dark-mode native styling */
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  outline: none;
+}
+.create-user-form input:focus,
+.create-user-form select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
 }
 
 .create-user-form button {
-  padding: 10px 25px;
-  background: #667eea;
+  padding: 11px 22px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 1rem;
-  font-weight: bold;
-  transition: all 0.3s;
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: all 0.25s;
+  white-space: nowrap;
+  min-height: 46px;
 }
-
 .create-user-form button:hover {
-  background: #5568d3;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.35);
 }
 
+/* ── Mobile: stack fields vertically ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .create-user-form { padding: 16px; border-radius: 12px; }
+  .create-user-form h2 { font-size: 1rem; }
+
+  .create-user-form form { flex-direction: column; gap: 10px; }
+
+  .create-user-form input,
+  .create-user-form select {
+    min-width: unset;
+    width: 100%;
+    font-size: 1rem;
+    min-height: 46px;
+  }
+
+  .create-user-form button { width: 100%; }
+}

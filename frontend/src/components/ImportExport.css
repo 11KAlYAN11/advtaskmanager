@@ -72,6 +72,35 @@
   line-height: 1.5;
 }
 
+/* ── Format tabs (JSON / CSV) ─────────────────────────────────────────────── */
+.ie-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  background: #f4f4f4;
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.ie-tab {
+  flex: 1;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: #666;
+  transition: all 0.18s;
+}
+.ie-tab:hover { background: rgba(102,126,234,0.1); color: #667eea; }
+.ie-tab--active {
+  background: white;
+  color: #667eea;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
 /* Status banner */
 .ie-status {
   padding: 10px 14px;

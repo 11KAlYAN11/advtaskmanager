@@ -28,6 +28,8 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<!-- Set to true via CLI to skip unit tests: ./mvnw verify -DskipUnitTests=true -->
+		<skipUnitTests>false</skipUnitTests>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -128,6 +130,52 @@
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
+			</plugin>
+
+			<!--
+			  ┌─────────────────────────────────────────────────────────────┐
+			  │  SUREFIRE  — unit tests   (./mvnw test)                     │
+			  │  Only runs tests inside the unit package.                   │
+			  │  No Spring context → fast (< 5 s).                         │
+			  │  Skip with:  ./mvnw test -DskipUnitTests=true              │
+			  └─────────────────────────────────────────────────────────────┘
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skip>${skipUnitTests}</skip>
+					<includes>
+						<include>**/unit/**/*Test.java</include>
+					</includes>
+				</configuration>
+			</plugin>
+
+			<!--
+			  ┌─────────────────────────────────────────────────────────────┐
+			  │  FAILSAFE — integration tests  (./mvnw verify)              │
+			  │  Runs @SpringBootTest suites with H2 in-memory DB.          │
+			  │  Skip with:  ./mvnw verify -DskipITs=true                  │
+			  │  Integration only: ./mvnw verify -DskipUnitTests=true      │
+			  └─────────────────────────────────────────────────────────────┘
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<includes>
+						<include>**/integration/**/*.java</include>
+						<include>**/*ApplicationTests.java</include>
+					</includes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

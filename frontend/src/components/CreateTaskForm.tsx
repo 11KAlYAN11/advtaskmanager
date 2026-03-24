@@ -1,19 +1,27 @@
 import { useState } from 'react';
-import type { Task } from '../types/types';
+import type { Task, TaskStatus } from '../types/types';
 import './CreateTaskForm.css';
 
 interface Props {
   onCreateTask: (task: Omit<Task, 'id'>) => void;
 }
 
+const STATUS_OPTIONS: { value: TaskStatus; emoji: string; label: string }[] = [
+  { value: 'TODO',        emoji: '📝', label: 'TODO' },
+  { value: 'IN_PROGRESS', emoji: '🔄', label: 'IN PROG' },
+  { value: 'REVIEW',      emoji: '👁️', label: 'REVIEW' },
+  { value: 'DONE',        emoji: '✅', label: 'DONE' },
+];
+
 export default function CreateTaskForm({ onCreateTask }: Props) {
-  const [title, setTitle] = useState('');
+  const [title,       setTitle]       = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE'>('TODO');
+  const [status,      setStatus]      = useState<TaskStatus>('TODO');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onCreateTask({ title, description, status });
+    if (!title.trim()) return;
+    onCreateTask({ title: title.trim(), description: description.trim(), status });
     setTitle('');
     setDescription('');
     setStatus('TODO');
@@ -31,20 +39,32 @@ export default function CreateTaskForm({ onCreateTask }: Props) {
           required
         />
         <textarea
-          placeholder="Task Description"
+          placeholder="Task Description (optional)"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={3}
         />
-        <select value={status} onChange={(e) => setStatus(e.target.value as any)}>
-          <option value="TODO">📝 TODO</option>
-          <option value="IN_PROGRESS">🔄 IN PROGRESS</option>
-          <option value="REVIEW">👁️ REVIEW</option>
-          <option value="DONE">✅ DONE</option>
-        </select>
-        <button type="submit">Create Task</button>
+
+        {/* ── Status pill selector — replaces plain <select> ──────────────── */}
+        <div>
+          <span className="status-select-label">📌 Initial Status</span>
+          <div className="status-pills">
+            {STATUS_OPTIONS.map(({ value, emoji, label }) => (
+              <button
+                key={value}
+                type="button"
+                className={`status-pill${status === value ? ` active-${value}` : ''}`}
+                onClick={() => setStatus(value)}
+              >
+                <span className="pill-emoji">{emoji}</span>
+                <span className="pill-label">{label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button type="submit">✚ Create Task</button>
       </form>
     </div>
   );
 }
-

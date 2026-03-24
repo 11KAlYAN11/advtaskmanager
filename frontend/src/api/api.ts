@@ -124,6 +124,8 @@ export const taskAPI = {
 
 // ── Import / Export API ────────────────────────────────────────────────────
 export const dataAPI = {
+  // ── JSON ──────────────────────────────────────────────────────────────────
+
   // Download full snapshot as a parsed JSON object
   export: (): Promise<object> =>
     fetch(`${API_BASE_URL}/data/export`, { headers: authHeaders() })
@@ -137,5 +139,26 @@ export const dataAPI = {
       headers: authHeaders(),
       body: JSON.stringify(snapshot),
     }).then(handleResponse).then(res => res.text()),
+
+  // ── CSV ───────────────────────────────────────────────────────────────────
+
+  // Download all data as a ZIP containing users.csv + tasks.csv
+  exportCsv: (): Promise<Blob> =>
+    fetch(`${API_BASE_URL}/data/export/csv`, { headers: authHeaders() })
+      .then(handleResponse)
+      .then(res => res.blob()),
+
+  // Upload a ZIP file (users.csv + tasks.csv) to restore all data
+  importCsv: (file: File): Promise<string> => {
+    const form = new FormData();
+    form.append('file', file);
+    const token = localStorage.getItem('token');
+    return fetch(`${API_BASE_URL}/data/import/csv`, {
+      method: 'POST',
+      // Don't set Content-Type — browser sets multipart boundary automatically
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    }).then(handleResponse).then(res => res.text());
+  },
 };
 

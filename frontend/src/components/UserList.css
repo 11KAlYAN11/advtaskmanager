@@ -1,25 +1,27 @@
 .user-list h2 {
   margin-bottom: 20px;
-  color: #333;
+  color: #1a1a2e;
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
 .users-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
 }
 
 .user-card {
-  padding: 20px;
-  border-radius: 10px;
+  padding: 18px;
+  border-radius: 12px;
   background: white;
   border: 2px solid #e9ecef;
-  transition: all 0.3s;
+  transition: transform 0.25s, box-shadow 0.25s;
 }
 
 .user-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .user-card.admin {
@@ -34,19 +36,25 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
+  gap: 8px;
 }
 
 .user-header h3 {
   margin: 0;
-  color: #333;
+  color: #1a1a2e;
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 .role-badge {
   padding: 4px 12px;
   border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: bold;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  flex-shrink: 0;
 }
 
 .role-badge.admin {
@@ -61,28 +69,56 @@
 
 .email {
   color: #666;
-  margin: 10px 0;
+  font-size: 0.875rem;
+  margin: 8px 0;
 }
 
 .task-count {
   color: #667eea;
-  font-weight: bold;
-  margin: 10px 0;
+  font-weight: 700;
+  font-size: 0.875rem;
+  margin: 8px 0;
 }
 
 .delete-btn {
   width: 100%;
-  padding: 8px;
-  background: #dc3545;
+  padding: 10px;
+  background: linear-gradient(135deg, #dc3545, #c82333);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s;
+  font-weight: 700;
+  font-size: 0.88rem;
+  transition: all 0.2s;
+  margin-top: 12px;
+  min-height: 42px;
 }
 
 .delete-btn:hover {
-  background: #c82333;
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
+/* ── Mobile ──────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .users-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .user-card {
+    padding: 14px;
+  }
+
+  .delete-btn {
+    min-height: 46px;
+    font-size: 0.92rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .users-grid {
+    grid-template-columns: 1fr;
+  }
+}

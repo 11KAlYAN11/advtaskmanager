@@ -70,6 +70,9 @@
   border: 2px solid #e5e7eb;
   border-radius: 10px;
   font-size: 1rem;
+  color: #1a1a2e;           /* explicit dark text */
+  background: #ffffff;      /* explicit white background */
+  color-scheme: light;      /* force light native control */
   transition: border-color 0.2s, box-shadow 0.2s;
   outline: none;
   width: 100%;
@@ -139,5 +142,21 @@
   border-radius: 6px;
   color: #374151;
   font-weight: 600;
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 20px;
+    border-radius: 16px;
+  }
+  .login-header h1 { font-size: 1.35rem; }
+  .login-logo      { font-size: 2.5rem; }
+  .login-btn       { padding: 13px; font-size: 0.95rem; }
+  .form-group input { font-size: 1rem; min-height: 46px; }
+}
+
+@media (max-width: 360px) {
+  .login-card { padding: 24px 16px; }
 }
 

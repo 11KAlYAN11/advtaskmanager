@@ -230,16 +230,36 @@
 }
 
 /* ── Mobile responsive ─────────────────────────────────────────────────────── */
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .ai-panel {
-    width: calc(100vw - 32px);
-    right: 16px;
-    bottom: 90px;
+    width: calc(100vw - 24px);
+    right: 12px;
+    bottom: 86px;
+    max-height: 70vh;
+    border-radius: 16px;
   }
 
   .ai-fab {
     right: 16px;
     bottom: 16px;
+    width: 54px;
+    height: 54px;
+    font-size: 1.4rem;
+  }
+
+  .ai-suggestion {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+  }
+
+  .ai-input { font-size: 0.9rem; }
+}
+
+@media (max-width: 380px) {
+  .ai-panel {
+    width: calc(100vw - 16px);
+    right: 8px;
+    left: 8px;
   }
 }
 

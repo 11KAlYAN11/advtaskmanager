@@ -1,49 +1,125 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
-.App { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
-/* Header – now flex row to put user info on the right */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.App {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────────── */
 .app-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   color: white;
-  margin-bottom: 30px;
-  padding: 24px 30px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  margin-bottom: 24px;
+  padding: 20px 28px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
   border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  flex-wrap: wrap;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   gap: 16px;
+  flex-wrap: wrap;
 }
-.header-left h1 { font-size: 2rem; margin-bottom: 4px; }
-.header-left p  { font-size: 1rem; opacity: 0.85; }
 
-.header-right { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.header-left h1 { font-size: 1.85rem; margin-bottom: 4px; font-weight: 800; }
+.header-left p  { font-size: 0.9rem; opacity: 0.85; }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 
 .user-badge { display: flex; align-items: center; gap: 8px; }
-.user-name  { font-weight: 600; font-size: 0.95rem; }
+.user-name  { font-weight: 600; font-size: 0.9rem; }
 
-.role-pill { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.role-pill {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 .role-pill.admin { background: #dc3545; color: white; }
 .role-pill.user  { background: rgba(255,255,255,0.25); color: white; border: 1px solid rgba(255,255,255,0.4); }
 
-.logout-btn { padding: 8px 18px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.4); color: white; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; }
-.logout-btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-1px); }
+.logout-btn {
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: all 0.2s;
+  white-space: nowrap;
+  min-height: 38px;
+}
+.logout-btn:hover { background: rgba(255,255,255,0.28); transform: translateY(-1px); }
 
-.tabs { display: flex; gap: 10px; margin-bottom: 30px; justify-content: center; }
-.tab { padding: 12px 30px; border: none; background: rgba(255, 255, 255, 0.2); color: white; border-radius: 10px; cursor: pointer; font-size: 1.1rem; transition: all 0.3s; }
-.tab:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
-.tab.active { background: white; color: #667eea; font-weight: bold; }
-.content { background: white; border-radius: 20px; padding: 30px; min-height: 500px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
-.loading { display: flex; justify-content: center; align-items: center; height: 100vh; font-size: 2rem; color: white; font-weight: bold; }
+/* ── Tabs ────────────────────────────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  justify-content: center;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
 
+.tab {
+  padding: 12px 28px;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s;
+  white-space: nowrap;
+  min-height: 46px;
+}
+.tab:hover  { background: rgba(255, 255, 255, 0.32); transform: translateY(-2px); }
+.tab.active { background: white; color: #667eea; }
+
+/* ── Content card ────────────────────────────────────────────────────────────── */
+.content {
+  background: white;
+  border-radius: 20px;
+  padding: 28px;
+  min-height: 500px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.8rem;
+  color: white;
+  font-weight: bold;
+}
+
+/* ── Error toast ─────────────────────────────────────────────────────────────── */
 .error-toast {
   background: #dc3545;
   color: white;
   padding: 12px 20px;
-  border-radius: 10px;
+  border-radius: 12px;
   margin-bottom: 16px;
   font-weight: 600;
   text-align: center;
@@ -55,3 +131,72 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Ox
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Tablet (≤ 1024px) ───────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .App { padding: 16px; }
+  .app-header { padding: 18px 22px; }
+  .header-left h1 { font-size: 1.55rem; }
+  .content { padding: 22px; }
+}
+
+/* ── Mobile (≤ 768px) ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .App { padding: 12px; }
+
+  .app-header {
+    padding: 16px 18px;
+    gap: 12px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+  }
+
+  .header-left h1 { font-size: 1.25rem; margin-bottom: 2px; }
+  .header-left p  { font-size: 0.8rem; }
+
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .user-badge { gap: 6px; }
+  .user-name  { font-size: 0.82rem; }
+  .role-pill  { font-size: 0.68rem; padding: 3px 9px; }
+
+  .logout-btn { padding: 8px 12px; font-size: 0.82rem; }
+
+  .tabs {
+    justify-content: flex-start;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .tab {
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    border-radius: 10px;
+    min-height: 42px;
+  }
+
+  .content {
+    padding: 14px;
+    border-radius: 16px;
+    min-height: auto;
+  }
+}
+
+/* ── Small mobile (≤ 480px) ──────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .App { padding: 10px; }
+
+  .app-header {
+    padding: 14px 14px;
+    border-radius: 14px;
+  }
+
+  .header-left h1 { font-size: 1.1rem; }
+  .header-left p  { display: none; } /* hide subtitle on very small screens */
+
+  .content { padding: 12px; border-radius: 14px; }
+
+  .tab { padding: 9px 14px; font-size: 0.85rem; }
+}
