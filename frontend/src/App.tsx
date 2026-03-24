@@ -9,6 +9,7 @@ import CreateUserForm from './components/CreateUserForm';
 import CreateTaskForm from './components/CreateTaskForm';
 import LoginPage from './components/LoginPage';
 import AIAssistant from './components/AIAssistant';
+import ImportExport from './components/ImportExport';
 
 // ── Main app (only shown when authenticated) ──────────────────────────────────
 function MainApp() {
@@ -94,6 +95,8 @@ function MainApp() {
             <span className={`role-pill ${user?.role.toLowerCase()}`}>{user?.role}</span>
             <span className="user-name">👤 {user?.name}</span>
           </div>
+          {/* Backup/Restore — ADMIN only */}
+          {isAdmin && <ImportExport onImportComplete={loadData} />}
           <button className="logout-btn" onClick={logout}>🚪 Logout</button>
         </div>
       </header>

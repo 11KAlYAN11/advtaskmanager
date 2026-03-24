@@ -121,3 +121,21 @@ export const taskAPI = {
       headers: authHeaders(),
     }).then(handleResponse).then(res => res.text()),
 };
+
+// ── Import / Export API ────────────────────────────────────────────────────
+export const dataAPI = {
+  // Download full snapshot as a parsed JSON object
+  export: (): Promise<object> =>
+    fetch(`${API_BASE_URL}/data/export`, { headers: authHeaders() })
+      .then(handleResponse)
+      .then(res => res.json()),
+
+  // Upload a JSON snapshot and restore all data
+  import: (snapshot: object): Promise<string> =>
+    fetch(`${API_BASE_URL}/data/import`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify(snapshot),
+    }).then(handleResponse).then(res => res.text()),
+};
+

@@ -80,6 +80,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,   "/api/users/**").hasRole("ADMIN")  // create user
                         .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")  // delete user
                         .requestMatchers(HttpMethod.DELETE, "/api/tasks/**").hasRole("ADMIN")  // delete task
+                        .requestMatchers("/api/data/**").hasRole("ADMIN")                      // import/export
 
                         // ── Any authenticated user ─────────────────────────
                         .anyRequest().authenticated()
