@@ -29,6 +29,7 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "priority")
+    @Builder.Default
     private TaskPriority priority = TaskPriority.MEDIUM;
 
     @Column(name = "due_date")

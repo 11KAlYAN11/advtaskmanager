@@ -1,7 +1,6 @@
-
 package com.kalyan.advtaskmanager.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,6 +30,7 @@ public class User {
     private Role role;
 
     @OneToMany(mappedBy = "assignedTo", cascade = CascadeType.ALL)
-    @JsonIgnoreProperties("assignedTo") // Prevents infinite recursion
+    @JsonIgnore          // ← never serialize tasks on a User (stops N+1 on GET /api/users)
+    @ToString.Exclude    // ← stops Lombok toString() from triggering the lazy load
     private List<Task> tasks;
 }

@@ -10,7 +10,7 @@
 7) Make the app responsive and mobile-friendly (CSS media queries, flexbox/grid) can't able to move the tasks in mobile
 
 8) How about some telegram bot integration for notifications and task management on the go? (Telegram Bot API, Spring WebClient) how about adding and doing some stuff there also as per convience
-
+9) fix the ai issue in Ui 
 > What's already **done** → what's worth building next, why it matters for learning,
 > and what it adds to the app.  Ordered by impact × feasibility.
 
