@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,6 +26,13 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "priority")
+    private TaskPriority priority = TaskPriority.MEDIUM;
+
+    @Column(name = "due_date")
+    private LocalDate dueDate;
 
     /*
     👉 One User can have many Tasks

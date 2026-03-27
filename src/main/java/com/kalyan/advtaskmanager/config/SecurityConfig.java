@@ -55,12 +55,12 @@ public class SecurityConfig {
                         .xssProtection(xss -> xss.disable())  // modern browsers ignore X-XSS-Protection; CSP handles it
                         .contentSecurityPolicy(csp -> csp.policyDirectives(
                                 "default-src 'self'; " +
-                                "script-src 'self' 'unsafe-inline'; " +
+                                "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
                                 "style-src 'self' 'unsafe-inline'; " +
                                 "img-src 'self' data:; " +
                                 "connect-src 'self' https://api.groq.com https://api.openai.com"
                         ))
-                        .frameOptions(frame -> frame.deny())                // block clickjacking
+                        .frameOptions(frame -> frame.sameOrigin())              // allow Swagger UI iframe
                         .httpStrictTransportSecurity(hsts -> hsts           // HSTS (HTTPS only)
                                 .includeSubDomains(true)
                                 .maxAgeInSeconds(31536000)
@@ -75,6 +75,11 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").hasRole("ADMIN")
                         // ── Public ────────────────────────────────────────
                         .requestMatchers("/api/auth/**").permitAll()
+                        // ── Swagger / OpenAPI ─────────────────────────────
+                        .requestMatchers(
+                                "/swagger-ui/**", "/swagger-ui.html",
+                                "/v3/api-docs/**", "/v3/api-docs"
+                        ).permitAll()
 
                         // ── ADMIN only ────────────────────────────────────
                         .requestMatchers(HttpMethod.POST,   "/api/users/**").hasRole("ADMIN")  // create user

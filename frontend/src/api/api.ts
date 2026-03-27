@@ -1,4 +1,5 @@
 import type { AuthResponse } from '../types/types';
+import type { TaskFilterParams } from '../types/types';
 
 // API Base URL — reads from env var in production, falls back to localhost for dev
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
@@ -74,9 +75,16 @@ export const userAPI = {
 
 // ── Task API ──────────────────────────────────────────────────────────────────
 export const taskAPI = {
-  getAll: () =>
-    fetch(`${API_BASE_URL}/tasks`, { headers: authHeaders() })
-      .then(handleResponse).then(res => res.json()),
+  getAll: (filters?: TaskFilterParams) => {
+    const params = new URLSearchParams();
+    if (filters?.status)     params.set('status',     filters.status);
+    if (filters?.priority)   params.set('priority',   filters.priority);
+    if (filters?.assignedTo) params.set('assignedTo', String(filters.assignedTo));
+    if (filters?.q)          params.set('q',          filters.q);
+    const qs = params.toString();
+    return fetch(`${API_BASE_URL}/tasks${qs ? `?${qs}` : ''}`, { headers: authHeaders() })
+      .then(handleResponse).then(res => res.json());
+  },
 
   getById: (id: number) =>
     fetch(`${API_BASE_URL}/tasks/${id}`, { headers: authHeaders() })
@@ -90,7 +98,7 @@ export const taskAPI = {
     fetch(`${API_BASE_URL}/tasks/status?status=${status}`, { headers: authHeaders() })
       .then(handleResponse).then(res => res.json()),
 
-  create: (task: { title: string; description: string; status: string }) =>
+  create: (task: { title: string; description: string; status: string; priority?: string; dueDate?: string }) =>
     fetch(`${API_BASE_URL}/tasks`, {
       method: 'POST',
       headers: authHeaders(),

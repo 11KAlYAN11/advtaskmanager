@@ -12,3 +12,9 @@ ALTER TABLE task DROP CONSTRAINT IF EXISTS task_status_check;
 -- Step 2: recreate with the CORRECT set of values including REVIEW
 ALTER TABLE task ADD CONSTRAINT task_status_check
     CHECK (status IN ('TODO', 'IN_PROGRESS', 'REVIEW', 'DONE'));
+
+-- Step 3: add priority constraint (idempotent)
+ALTER TABLE task DROP CONSTRAINT IF EXISTS task_priority_check;
+ALTER TABLE task ADD CONSTRAINT task_priority_check
+    CHECK (priority IN ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL'));
+

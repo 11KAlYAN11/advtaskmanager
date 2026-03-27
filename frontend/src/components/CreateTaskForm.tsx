@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Task, TaskStatus } from '../types/types';
+import type { Task, TaskStatus, TaskPriority } from '../types/types';
 import './CreateTaskForm.css';
 
 interface Props {
@@ -17,14 +17,24 @@ export default function CreateTaskForm({ onCreateTask }: Props) {
   const [title,       setTitle]       = useState('');
   const [description, setDescription] = useState('');
   const [status,      setStatus]      = useState<TaskStatus>('TODO');
+  const [priority,    setPriority]    = useState<TaskPriority | ''>('');   // no default
+  const [dueDate,     setDueDate]     = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
-    onCreateTask({ title: title.trim(), description: description.trim(), status });
+    onCreateTask({
+      title:       title.trim(),
+      description: description.trim(),
+      status,
+      priority:    priority || undefined,   // omit if not chosen
+      dueDate:     dueDate  || undefined,   // omit if not set
+    });
     setTitle('');
     setDescription('');
     setStatus('TODO');
+    setPriority('');
+    setDueDate('');
   };
 
   return (
@@ -45,7 +55,7 @@ export default function CreateTaskForm({ onCreateTask }: Props) {
           rows={3}
         />
 
-        {/* ── Status pill selector — replaces plain <select> ──────────────── */}
+        {/* ── Status pill selector ─────────────────────────────────────────── */}
         <div>
           <span className="status-select-label">📌 Initial Status</span>
           <div className="status-pills">
@@ -60,6 +70,36 @@ export default function CreateTaskForm({ onCreateTask }: Props) {
                 <span className="pill-label">{label}</span>
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* ── Priority dropdown ────────────────────────────────────────────── */}
+        <div className="form-row-inline">
+          <div className="form-field">
+            <span className="status-select-label">⚡ Priority</span>
+            <select
+              className="form-select"
+              value={priority}
+              onChange={(e) => setPriority(e.target.value as TaskPriority | '')}
+            >
+              <option value="">— No priority —</option>
+              <option value="LOW">🟢 Low</option>
+              <option value="MEDIUM">🔵 Medium</option>
+              <option value="HIGH">🟠 High</option>
+              <option value="CRITICAL">🔴 Critical</option>
+            </select>
+          </div>
+
+          {/* ── Due Date ────────────────────────────────────────────────────── */}
+          <div className="form-field">
+            <span className="status-select-label">📅 Due Date <span className="optional-hint">(optional)</span></span>
+            <input
+              type="date"
+              className="form-date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              min={new Date().toISOString().split('T')[0]}
+            />
           </div>
         </div>
 

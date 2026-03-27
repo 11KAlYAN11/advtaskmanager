@@ -10,9 +10,10 @@ interface Props {
   onAssignTask: (taskId: number, userId: number) => void;
   onUpdateStatus: (taskId: number, status: TaskStatus) => void;
   onDeleteTask: (id: number) => void;
+  onTaskClick?: (task: Task) => void;
 }
 
-export default function TaskBoard({ tasks, users, isAdmin, onAssignTask, onUpdateStatus, onDeleteTask }: Props) {
+export default function TaskBoard({ tasks, users, isAdmin, onAssignTask, onUpdateStatus, onDeleteTask, onTaskClick }: Props) {
   const columns: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'REVIEW', 'DONE'];
   const [dragOverColumn, setDragOverColumn]   = useState<TaskStatus | null>(null);
   const [activeColumn,   setActiveColumn]     = useState<TaskStatus>('TODO');
@@ -130,6 +131,7 @@ export default function TaskBoard({ tasks, users, isAdmin, onAssignTask, onUpdat
                     onAssignTask={onAssignTask}
                     onUpdateStatus={onUpdateStatus}
                     onDeleteTask={onDeleteTask}
+                    onTaskClick={onTaskClick}
                   />
                 ))}
                 {isOver && columnTasks.length === 0 && <div className="drop-hint">⬇ Drop here</div>}

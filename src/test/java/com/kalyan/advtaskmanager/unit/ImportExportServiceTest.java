@@ -229,7 +229,7 @@ class ImportExportServiceTest {
         byte[] zip = service.exportAsCsvZip();
         String tasksCsv = extractEntryContent(zip, "tasks.csv");
 
-        assertThat(tasksCsv).startsWith("id,title,description,status,assignedToId,createdAt,updatedAt\n");
+        assertThat(tasksCsv).startsWith("id,title,description,status,priority,dueDate,assignedToId,createdAt,updatedAt\n");
         assertThat(tasksCsv).contains("Fix Login Bug");
         assertThat(tasksCsv).contains("TODO");
     }

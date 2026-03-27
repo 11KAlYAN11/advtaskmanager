@@ -5,6 +5,7 @@ import com.kalyan.advtaskmanager.dto.TaskExportDto;
 import com.kalyan.advtaskmanager.dto.UserExportDto;
 import com.kalyan.advtaskmanager.entity.Role;
 import com.kalyan.advtaskmanager.entity.Task;
+import com.kalyan.advtaskmanager.entity.TaskPriority;
 import com.kalyan.advtaskmanager.entity.TaskStatus;
 import com.kalyan.advtaskmanager.entity.User;
 import com.kalyan.advtaskmanager.repository.TaskRepository;
@@ -53,6 +54,8 @@ public class ImportExportService {
                         .title(t.getTitle())
                         .description(t.getDescription())
                         .status(t.getStatus() != null ? t.getStatus().name() : "TODO")
+                        .priority(t.getPriority() != null ? t.getPriority().name() : "MEDIUM")
+                        .dueDate(t.getDueDate())
                         .assignedToId(t.getAssignedTo() != null ? t.getAssignedTo().getId() : null)
                         .createdAt(t.getCreatedAt())
                         .updatedAt(t.getUpdatedAt())
@@ -104,6 +107,8 @@ public class ImportExportService {
                     .title(dto.getTitle())
                     .description(dto.getDescription() != null ? dto.getDescription() : "")
                     .status(dto.getStatus() != null ? TaskStatus.valueOf(dto.getStatus()) : TaskStatus.TODO)
+                    .priority(dto.getPriority() != null ? TaskPriority.valueOf(dto.getPriority()) : TaskPriority.MEDIUM)
+                    .dueDate(dto.getDueDate())
                     .createdAt(dto.getCreatedAt())
                     .updatedAt(dto.getUpdatedAt());
 
@@ -158,12 +163,14 @@ public class ImportExportService {
     }
 
     private String buildTasksCsv(List<Task> tasks) {
-        StringBuilder sb = new StringBuilder("id,title,description,status,assignedToId,createdAt,updatedAt\n");
+        StringBuilder sb = new StringBuilder("id,title,description,status,priority,dueDate,assignedToId,createdAt,updatedAt\n");
         for (Task t : tasks) {
             sb.append(t.getId()).append(',')
               .append(quoteCsv(t.getTitle())).append(',')
               .append(quoteCsv(t.getDescription() != null ? t.getDescription() : "")).append(',')
               .append(t.getStatus() != null ? t.getStatus().name() : "TODO").append(',')
+              .append(t.getPriority() != null ? t.getPriority().name() : "MEDIUM").append(',')
+              .append(t.getDueDate() != null ? t.getDueDate() : "").append(',')
               .append(t.getAssignedTo() != null ? t.getAssignedTo().getId() : "").append(',')
               .append(t.getCreatedAt() != null ? t.getCreatedAt() : "").append(',')
               .append(t.getUpdatedAt() != null ? t.getUpdatedAt() : "").append('\n');
@@ -248,21 +255,45 @@ public class ImportExportService {
 
     private List<TaskExportDto> parseTasksCsv(String csv) {
         List<String[]> rows = parseCsvRows(csv);
+        if (rows.isEmpty()) return new ArrayList<>();
+
+        // Detect column positions from header row (backward-compatible with old CSVs)
+        String[] header = rows.get(0);
+        Map<String, Integer> col = new HashMap<>();
+        for (int i = 0; i < header.length; i++) col.put(header[i].trim().toLowerCase(), i);
+
         List<TaskExportDto> result = new ArrayList<>();
-        for (int i = 1; i < rows.size(); i++) {   // row 0 is the header
+        for (int i = 1; i < rows.size(); i++) {
             String[] r = rows.get(i);
-            if (r.length < 7) continue;
+            if (r.length < 4) continue;
+
+            String status   = getCol(r, col, "status",   "TODO");
+            String priority = getCol(r, col, "priority", "MEDIUM");
+            String dueDateStr = getCol(r, col, "duedate", "");
+            String assignedStr = getCol(r, col, "assignedtoid", "");
+            String createdStr  = getCol(r, col, "createdat", "");
+            String updatedStr  = getCol(r, col, "updatedat", "");
+
             result.add(TaskExportDto.builder()
-                    .id(r[0].isBlank() ? null : Long.parseLong(r[0].trim()))
-                    .title(r[1])
-                    .description(r[2])
-                    .status(r[3].isBlank() ? "TODO" : r[3].trim())
-                    .assignedToId(r[4].isBlank() ? null : Long.parseLong(r[4].trim()))
-                    .createdAt(r[5].isBlank() ? null : LocalDateTime.parse(r[5].trim()))
-                    .updatedAt(r[6].isBlank() ? null : LocalDateTime.parse(r[6].trim()))
+                    .id(getCol(r, col, "id", "").isBlank() ? null : Long.parseLong(getCol(r, col, "id", "").trim()))
+                    .title(getCol(r, col, "title", ""))
+                    .description(getCol(r, col, "description", ""))
+                    .status(status.isBlank() ? "TODO" : status.trim())
+                    .priority(priority.isBlank() ? "MEDIUM" : priority.trim())
+                    .dueDate(dueDateStr.isBlank() ? null : java.time.LocalDate.parse(dueDateStr.trim()))
+                    .assignedToId(assignedStr.isBlank() ? null : Long.parseLong(assignedStr.trim()))
+                    .createdAt(createdStr.isBlank() ? null : LocalDateTime.parse(createdStr.trim()))
+                    .updatedAt(updatedStr.isBlank() ? null : LocalDateTime.parse(updatedStr.trim()))
                     .build());
         }
         return result;
+    }
+
+    /** Safely read a CSV column by name from a header map; returns defaultVal if not found. */
+    private String getCol(String[] row, Map<String, Integer> col, String name, String defaultVal) {
+        Integer idx = col.get(name);
+        if (idx == null || idx >= row.length) return defaultVal;
+        return row[idx];
     }
 
     /** Splits a CSV document string into a list of field arrays (one per non-blank line). */

@@ -1,7 +1,7 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useState, useEffect, useRef, useCallback } from 'react';
 import './App.css';
 import { userAPI, taskAPI } from './api/api';
-import type { User, Task, TaskStatus } from './types/types';
+import type { User, Task, TaskStatus, TaskFilterParams } from './types/types';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import UserList from './components/UserList';
 import TaskBoard from './components/TaskBoard';
@@ -10,39 +10,68 @@ import CreateTaskForm from './components/CreateTaskForm';
 import LoginPage from './components/LoginPage';
 import AIAssistant from './components/AIAssistant';
 import ImportExport from './components/ImportExport';
+import FilterBar from './components/FilterBar';
+import TaskDetailModal from './components/TaskDetailModal';
 
 // ── Main app (only shown when authenticated) ──────────────────────────────────
 function MainApp() {
   const { user, logout } = useAuth();
-  const [users, setUsers] = useState<User[]>([]);
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'board' | 'users'>('board');
-  const [dragError, setDragError] = useState<string | null>(null);
+  const [users, setUsers]               = useState<User[]>([]);
+  const [tasks, setTasks]               = useState<Task[]>([]);
+  const [loading, setLoading]           = useState(true);   // only true on first load
+  const [activeTab, setActiveTab]       = useState<'board' | 'users'>('board');
+  const [dragError, setDragError]       = useState<string | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  // Store filter params in a ref — updating it never triggers a re-render
+  const filterParamsRef  = useRef<TaskFilterParams>({});
+  const initialLoadDone  = useRef(false);
 
   const showError = (msg: string) => {
     setDragError(msg);
     setTimeout(() => setDragError(null), 4000);
   };
 
-  const loadData = async () => {
-    setLoading(true);
+  // ── Fetch only tasks (used after task mutations) ──────────────────────────
+  const refreshTasks = useCallback(async (filters?: TaskFilterParams) => {
+    try {
+      const tasksData = await taskAPI.getAll(filters ?? filterParamsRef.current);
+      setTasks(tasksData);
+    } catch (error) {
+      console.error('Error refreshing tasks:', error);
+    }
+  }, []);
+
+  // ── Full load — fetches users + tasks (used on mount and after user mutations) ──
+  const loadData = useCallback(async (filters?: TaskFilterParams) => {
+    const isFirst = !initialLoadDone.current;
+    if (isFirst) setLoading(true);
     try {
       const [usersData, tasksData] = await Promise.all([
         userAPI.getAll(),
-        taskAPI.getAll(),
+        taskAPI.getAll(filters ?? filterParamsRef.current),
       ]);
       setUsers(usersData);
       setTasks(tasksData);
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
-      setLoading(false);
+      if (isFirst) {
+        setLoading(false);
+        initialLoadDone.current = true;
+      }
     }
-  };
+  }, []);
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { loadData(); }, [loadData]);
 
+  // Filter changed by user — update ref (no re-render) then silently refresh tasks
+  const handleFilterChange = useCallback((params: TaskFilterParams) => {
+    filterParamsRef.current = params;
+    refreshTasks(params);
+  }, [refreshTasks]);
+
+  // ── Handlers — only refresh tasks (not users) after task mutations ────────
   const handleCreateUser = async (userData: Omit<User, 'id'>) => {
     try { await userAPI.create(userData); await loadData(); }
     catch (error) { console.error('Error creating user:', error); }
@@ -56,23 +85,23 @@ function MainApp() {
   };
 
   const handleCreateTask = async (taskData: Omit<Task, 'id'>) => {
-    try { await taskAPI.create(taskData); await loadData(); }
+    try { await taskAPI.create(taskData); await refreshTasks(); }
     catch (error) { console.error('Error creating task:', error); }
   };
 
   const handleAssignTask = async (taskId: number, userId: number) => {
-    try { await taskAPI.assignToUser(taskId, userId); await loadData(); }
+    try { await taskAPI.assignToUser(taskId, userId); await refreshTasks(); }
     catch (error) { console.error('Error assigning task:', error); showError('Failed to assign task.'); }
   };
 
   const handleUpdateStatus = async (taskId: number, status: TaskStatus) => {
-    try { await taskAPI.updateStatus(taskId, status); await loadData(); }
-    catch (error) { console.error('Error updating status:', error); showError(`Failed to move task to ${status}. Check console.`); }
+    try { await taskAPI.updateStatus(taskId, status); await refreshTasks(); }
+    catch (error) { console.error('Error updating status:', error); showError(`Failed to move task to ${status}.`); }
   };
 
   const handleDeleteTask = async (id: number) => {
     if (window.confirm('Delete this task?')) {
-      try { await taskAPI.delete(id); await loadData(); }
+      try { await taskAPI.delete(id); await refreshTasks(); }
       catch (error) { console.error('Error deleting task:', error); }
     }
   };
@@ -95,27 +124,20 @@ function MainApp() {
             <span className={`role-pill ${user?.role.toLowerCase()}`}>{user?.role}</span>
             <span className="user-name">👤 {user?.name}</span>
           </div>
-          {/* Backup/Restore — ADMIN only */}
           {isAdmin && <ImportExport onImportComplete={loadData} />}
           <button className="logout-btn" onClick={logout}>🚪 Logout</button>
         </div>
       </header>
 
-      {/* Error toast — shows when drag/API call fails */}
-      {dragError && (
-        <div className="error-toast">⚠️ {dragError}</div>
-      )}
+      {dragError && <div className="error-toast">⚠️ {dragError}</div>}
 
       <div className="tabs">
-        {/* Task Board — visible to everyone */}
         <button
           className={activeTab === 'board' ? 'tab active' : 'tab'}
           onClick={() => setActiveTab('board')}
         >
           📋 Task Board
         </button>
-
-        {/* Users tab — ADMIN only */}
         {isAdmin && (
           <button
             className={activeTab === 'users' ? 'tab active' : 'tab'}
@@ -130,6 +152,7 @@ function MainApp() {
         {activeTab === 'board' ? (
           <>
             <CreateTaskForm onCreateTask={handleCreateTask} />
+            <FilterBar users={users} onFilterChange={handleFilterChange} />
             <TaskBoard
               tasks={tasks}
               users={users}
@@ -137,10 +160,10 @@ function MainApp() {
               onAssignTask={handleAssignTask}
               onUpdateStatus={handleUpdateStatus}
               onDeleteTask={handleDeleteTask}
+              onTaskClick={(task) => setSelectedTask(task)}
             />
           </>
         ) : isAdmin ? (
-          /* Users tab — only reachable by ADMIN */
           <>
             <CreateUserForm onCreateUser={handleCreateUser} />
             <UserList users={users} onDeleteUser={handleDeleteUser} />
@@ -150,6 +173,9 @@ function MainApp() {
 
       {/* ── AI Assistant floating widget ─────────────────────────────────── */}
       <AIAssistant onRefresh={loadData} />
+
+      {/* ── Task Detail slide-over modal ─────────────────────────────────── */}
+      <TaskDetailModal task={selectedTask} onClose={() => setSelectedTask(null)} />
     </div>
   );
 }

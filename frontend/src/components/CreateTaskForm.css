@@ -107,6 +107,50 @@
   background: #f0f4ff;
 }
 
+/* ── Inline row (priority + due date side by side) ───────────────────────────── */
+.form-row-inline {
+  display: flex;
+  gap: 12px;
+}
+
+.form-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* ── Priority / date select & input ──────────────────────────────────────────── */
+.form-select,
+.form-date {
+  padding: 10px 12px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: #1a1a2e;
+  background: #ffffff;
+  color-scheme: light;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+.form-select:focus,
+.form-date:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+/* ── Optional hint ───────────────────────────────────────────────────────────── */
+.optional-hint {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
 /* ── Submit button ───────────────────────────────────────────────────────────── */
 .create-task-form button[type="submit"] {
   padding: 13px 24px;
@@ -137,9 +181,11 @@
   .create-task-form textarea { font-size: 1rem; min-height: 46px; }
   .status-pill { padding: 8px 4px; font-size: 0.72rem; }
   .status-pill .pill-emoji { font-size: 1rem; }
+  .form-select, .form-date { font-size: 0.95rem; min-height: 44px; }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 480px) {
+  .form-row-inline { flex-direction: column; gap: 8px; }
   .status-pills { gap: 5px; }
   .status-pill  { padding: 7px 3px; font-size: 0.68rem; }
 }

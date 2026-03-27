@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import type { Task, User, TaskStatus } from '../types/types';
+import type { Task, User, TaskStatus, TaskPriority } from '../types/types';
 import './TaskCard.css';
 
 interface Props {
@@ -9,6 +9,7 @@ interface Props {
   onAssignTask: (taskId: number, userId: number) => void;
   onUpdateStatus: (taskId: number, status: TaskStatus) => void;
   onDeleteTask: (id: number) => void;
+  onTaskClick?: (task: Task) => void;
 }
 
 const ALL_STATUSES: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'REVIEW', 'DONE'];
@@ -24,10 +25,26 @@ const STATUS_COLORS: Record<TaskStatus, string> = {
   REVIEW:      '#e67e00',
   DONE:        '#198754',
 };
+const PRIORITY_COLORS: Record<TaskPriority, string> = {
+  LOW:      '#198754',
+  MEDIUM:   '#0d6efd',
+  HIGH:     '#e67e00',
+  CRITICAL: '#dc3545',
+};
+const PRIORITY_LABELS: Record<TaskPriority, string> = {
+  LOW:      '🟢 LOW',
+  MEDIUM:   '🔵 MED',
+  HIGH:     '🟠 HIGH',
+  CRITICAL: '🔴 CRIT',
+};
 
-export default function TaskCard({ task, users, isAdmin, onAssignTask, onUpdateStatus, onDeleteTask }: Props) {
+export default function TaskCard({ task, users, isAdmin, onAssignTask, onUpdateStatus, onDeleteTask, onTaskClick }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [showMoveMenu, setShowMoveMenu] = useState(false);
+
+  // ── Due date helpers ──────────────────────────────────────────────────────
+  const today = new Date().toISOString().split('T')[0];
+  const isOverdue = task.dueDate ? task.dueDate < today && task.status !== 'DONE' : false;
 
   // ── Desktop drag handlers ─────────────────────────────────────────────────
   const handleDragStart = (e: React.DragEvent) => {
@@ -36,6 +53,14 @@ export default function TaskCard({ task, users, isAdmin, onAssignTask, onUpdateS
     setTimeout(() => cardRef.current?.classList.add('dragging'), 0);
   };
   const handleDragEnd = () => cardRef.current?.classList.remove('dragging');
+
+  // ── Card click → open detail modal ───────────────────────────────────────
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't open modal when clicking interactive elements
+    const target = e.target as HTMLElement;
+    if (target.closest('select') || target.closest('button')) return;
+    onTaskClick?.(task);
+  };
 
   // ── Assign handler ────────────────────────────────────────────────────────
   const handleAssign = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -54,23 +79,42 @@ export default function TaskCard({ task, users, isAdmin, onAssignTask, onUpdateS
   return (
     <div
       ref={cardRef}
-      className="task-card"
+      className={`task-card${isOverdue ? ' overdue' : ''}`}
       draggable
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      onClick={handleCardClick}
+      title="Click to view details"
     >
       {/* ── Header ──────────────────────────────────────────────────── */}
       <div className="task-header">
         <span className="drag-handle" title="Drag to move">⠿</span>
         <h4 className="task-title">{task.title}</h4>
+        {/* Priority badge */}
+        {task.priority && (
+          <span
+            className="priority-badge"
+            style={{ background: PRIORITY_COLORS[task.priority] }}
+            title={`Priority: ${task.priority}`}
+          >
+            {PRIORITY_LABELS[task.priority]}
+          </span>
+        )}
         {isAdmin && (
-          <button className="delete-btn-small" onClick={() => task.id && onDeleteTask(task.id)} title="Delete task">
+          <button className="delete-btn-small" onClick={(e) => { e.stopPropagation(); task.id && onDeleteTask(task.id); }} title="Delete task">
             🗑️
           </button>
         )}
       </div>
 
       {task.description && <p className="description">{task.description}</p>}
+
+      {/* ── Due Date ────────────────────────────────────────────────── */}
+      {task.dueDate && (
+        <div className={`due-date-row${isOverdue ? ' overdue-text' : ''}`}>
+          📅 {isOverdue ? '⚠️ Overdue — ' : ''}{task.dueDate}
+        </div>
+      )}
 
       {/* ── Assign dropdown ─────────────────────────────────────────── */}
       <div className="task-meta">
