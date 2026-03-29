@@ -13,6 +13,10 @@ import ImportExport from './components/ImportExport';
 import FilterBar from './components/FilterBar';
 import TaskDetailModal from './components/TaskDetailModal';
 
+// Derive backend root URL from the API base (strip "/api" suffix)
+const BACKEND_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api').replace(/\/api$/, '');
+const SWAGGER_URL = `${BACKEND_URL}/swagger-ui/index.html`;
+
 // ── Main app (only shown when authenticated) ──────────────────────────────────
 function MainApp() {
   const { user, logout } = useAuth();
@@ -125,6 +129,15 @@ function MainApp() {
             <span className="user-name">👤 {user?.name}</span>
           </div>
           {isAdmin && <ImportExport onImportComplete={loadData} />}
+          <a
+            className="api-docs-btn"
+            href={SWAGGER_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open Swagger API documentation"
+          >
+            📖 API Docs
+          </a>
           <button className="logout-btn" onClick={logout}>🚪 Logout</button>
         </div>
       </header>
