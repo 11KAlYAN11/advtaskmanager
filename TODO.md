@@ -9,8 +9,15 @@
 6) Import / Export tasks and users (CSV or JSON) when install and uninstall the app
 7) Make the app responsive and mobile-friendly (CSS media queries, flexbox/grid) can't able to move the tasks in mobile
 
-8) How about some telegram bot integration for notifications and task management on the go? (Telegram Bot API, Spring WebClient) how about adding and doing some stuff there also as per convience
-9) fix the ai issue in Ui 
+8) How about some telegram bot integration for notifications and task management on the go? (Telegram Bot API, Spring WebClient) how about adding and doing some stuff there also as per convince
+9) fix the AI issue in Ui 
+10) task moving is taking too much time while dragging needs to fix that
+
+11) for personal use task manager should be like what you are already using only personal no users assigned to etcc give that app demo to assistant to ask to replicate the same
+
+12) there was some SD's like on first request after some idle time the will be in idel or hibernate mode once on first request it will wakeup (may be 1st request will take some time)
+
+
 > What's already **done** → what's worth building next, why it matters for learning,
 > and what it adds to the app.  Ordered by impact × feasibility.
 

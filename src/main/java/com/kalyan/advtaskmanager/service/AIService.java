@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -42,15 +44,12 @@ public class AIService {
 
     // ── Entry point ───────────────────────────────────────────────────────────
     public ChatResponse processChat(String userMessage, String requesterRole) {
-        if (openAiKey.startsWith("REPLACE_")) {
+        if (openAiKey.startsWith("REPLACE_") || openAiKey.startsWith("${")) {
             return ChatResponse.error(
-                "⚙️ AI key not configured.\n\n" +
-                "**Free option (Groq):**\n" +
-                "1. Go to https://console.groq.com\n" +
-                "2. Sign up → API Keys → Create key\n" +
-                "3. Paste into application.properties:\n" +
-                "   openai.api.key=gsk_...\n" +
-                "4. Restart the backend"
+                "⚙️ Groq API key is not configured.\n\n" +
+                "Fix in Railway → Service Variables:\n" +
+                "  OPENAI_API_KEY = gsk_...\n\n" +
+                "Get a free key at https://console.groq.com"
             );
         }
 
@@ -58,12 +57,10 @@ public class AIService {
             List<Task> tasks = taskService.getAllTasks();
             List<User> users = userService.getAllUsers();
 
-            // Build conversation
             List<Map<String, Object>> messages = new ArrayList<>();
             messages.add(Map.of("role", "system", "content", buildSystemPrompt(tasks, users, requesterRole)));
             messages.add(Map.of("role", "user", "content", userMessage));
 
-            // ── Round 1: ask the AI what to do ────────────────────────────────
             Map<String, Object> round1 = callOpenAI(messages);
             Map<String, Object> aiMessage = extractMessage(round1);
 
@@ -72,11 +69,9 @@ public class AIService {
                     (List<Map<String, Object>>) aiMessage.get("tool_calls");
 
             if (toolCalls == null || toolCalls.isEmpty()) {
-                // Pure text reply — no action taken
                 return ChatResponse.success((String) aiMessage.get("content"), false);
             }
 
-            // ── Execute every tool call the AI requested ───────────────────────
             Map<String, Object> assistantMsg = new HashMap<>();
             assistantMsg.put("role", "assistant");
             assistantMsg.put("content", null);
@@ -100,14 +95,37 @@ public class AIService {
                 ));
             }
 
-            // ── Round 2: let the AI summarise what happened ───────────────────
             Map<String, Object> round2 = callOpenAI(messages);
             String finalReply = (String) extractMessage(round2).get("content");
-            return ChatResponse.success(finalReply, true); // tell frontend to reload data
+            return ChatResponse.success(finalReply, true);
 
+        } catch (HttpClientErrorException.Unauthorized e) {
+            log.error("Groq rejected the API key (401). Key prefix: {}",
+                    openAiKey.length() > 6 ? openAiKey.substring(0, 6) + "..." : "(too short)");
+            return ChatResponse.error(
+                "🔑 Groq API key is invalid or expired (401).\n\n" +
+                "Fix in Railway → Service Variables:\n" +
+                "  OPENAI_API_KEY = gsk_...\n\n" +
+                "Steps:\n" +
+                "1. Go to https://console.groq.com → API Keys\n" +
+                "2. Create a new key (starts with gsk_)\n" +
+                "3. Update OPENAI_API_KEY in Railway\n" +
+                "4. Redeploy the service"
+            );
+        } catch (HttpClientErrorException e) {
+            int status = e.getStatusCode().value();
+            if (status == 429) {
+                log.warn("Groq rate limit hit (429)");
+                return ChatResponse.error("⏳ Rate limit reached. Please wait a moment and try again.");
+            }
+            log.error("Groq HTTP error {}: {}", status, e.getResponseBodyAsString());
+            return ChatResponse.error("❌ AI service returned HTTP " + status + ". Please try again.");
+        } catch (ResourceAccessException e) {
+            log.error("Cannot reach Groq API: {}", e.getMessage());
+            return ChatResponse.error("🌐 Cannot reach the AI service. Check network/firewall settings.");
         } catch (Exception e) {
-            log.error("AI chat failed", e);
-            return ChatResponse.error("❌ Error talking to AI: " + e.getMessage());
+            log.error("AI chat failed unexpectedly", e);
+            return ChatResponse.error("❌ Unexpected AI error: " + e.getMessage());
         }
     }
 
