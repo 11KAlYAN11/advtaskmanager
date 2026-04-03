@@ -44,7 +44,15 @@ EXPOSE 8080
 
 ENTRYPOINT ["java", \
   "-XX:+UseContainerSupport", \
-  "-XX:MaxRAMPercentage=75.0", \
+  "-XX:+UseG1GC", \
+  "-XX:MaxRAMPercentage=70.0", \
+  "-XX:InitialRAMPercentage=40.0", \
+  "-XX:MinRAMPercentage=20.0", \
+  "-XX:MaxMetaspaceSize=200m", \
+  "-XX:CompressedClassSpaceSize=64m", \
+  "-XX:G1HeapRegionSize=4m", \
+  "-XX:+G1UseAdaptiveIHOP", \
+  "-XX:+ExitOnOutOfMemoryError", \
   "-Djava.security.egd=file:/dev/./urandom", \
   "-jar", "app.jar"]
 
