@@ -15,8 +15,28 @@ export const aiAPI = {
       headers: authHeaders(),
       body: JSON.stringify({ message }),
     });
-    await handleResponse(res);
-    return res.json();
+
+    await handleResponse(res); // handles 401 → auto-logout
+
+    if (!res.ok) {
+      // Server returned 4xx/5xx — surface a proper error object
+      return {
+        reply: `❌ Server error (HTTP ${res.status}). Please try again.`,
+        refreshData: false,
+        error: true,
+      };
+    }
+
+    const data: AIChatResponse = await res.json();
+
+    // Guard: ensure reply is always a string (never undefined / null)
+    if (!data.reply) {
+      return { reply: '⚠️ Received an empty response from the AI.', refreshData: false, error: true };
+    }
+
+    return data;
   },
 };
+
+
 

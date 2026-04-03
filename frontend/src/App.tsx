@@ -88,19 +88,35 @@ function MainApp() {
     }
   };
 
+  const handleAssignTask = async (taskId: number, userId: number) => {
+    // Optimistic: swap the assignedTo user immediately
+    const assignedUser = users.find(u => u.id === userId);
+    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, assignedTo: assignedUser } : t));
+    try {
+      await taskAPI.assignToUser(taskId, userId);
+    } catch (error) {
+      console.error('Error assigning task:', error);
+      showError('Failed to assign task.');
+      refreshTasks(); // revert
+    }
+  };
+
   const handleCreateTask = async (taskData: Omit<Task, 'id'>) => {
     try { await taskAPI.create(taskData); await refreshTasks(); }
     catch (error) { console.error('Error creating task:', error); }
   };
 
-  const handleAssignTask = async (taskId: number, userId: number) => {
-    try { await taskAPI.assignToUser(taskId, userId); await refreshTasks(); }
-    catch (error) { console.error('Error assigning task:', error); showError('Failed to assign task.'); }
-  };
-
   const handleUpdateStatus = async (taskId: number, status: TaskStatus) => {
-    try { await taskAPI.updateStatus(taskId, status); await refreshTasks(); }
-    catch (error) { console.error('Error updating status:', error); showError(`Failed to move task to ${status}.`); }
+    // Optimistic: move the card instantly — zero perceived latency
+    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status } : t));
+    try {
+      await taskAPI.updateStatus(taskId, status);
+      // Success — optimistic state is already correct, no refresh needed
+    } catch (error) {
+      console.error('Error updating status:', error);
+      showError(`Failed to move task to ${status}.`);
+      refreshTasks(); // revert to server state on failure
+    }
   };
 
   const handleDeleteTask = async (id: number) => {
