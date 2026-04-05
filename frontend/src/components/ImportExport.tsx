@@ -116,7 +116,7 @@ export default function ImportExport({ onImportComplete }: Props) {
         onClick={() => setShowPanel(p => !p)}
         title="Import / Export Data"
       >
-        💾 Backup
+        💾 <span className="btn-label">Backup</span>
       </button>
 
       {showPanel && (

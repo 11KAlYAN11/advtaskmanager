@@ -144,17 +144,21 @@ function MainApp() {
             <span className={`role-pill ${user?.role.toLowerCase()}`}>{user?.role}</span>
             <span className="user-name">👤 {user?.name}</span>
           </div>
-          {isAdmin && <ImportExport onImportComplete={loadData} />}
-          <a
-            className="api-docs-btn"
-            href={SWAGGER_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Open Swagger API documentation"
-          >
-            📖 API Docs
-          </a>
-          <button className="logout-btn" onClick={logout}>🚪 Logout</button>
+          <div className="header-actions">
+            {isAdmin && <ImportExport onImportComplete={loadData} />}
+            <a
+              className="api-docs-btn"
+              href={SWAGGER_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Open Swagger API documentation"
+            >
+              📖 <span className="btn-label">API Docs</span>
+            </a>
+            <button className="logout-btn" onClick={logout}>
+              🚪 <span className="btn-label">Logout</span>
+            </button>
+          </div>
         </div>
       </header>
 

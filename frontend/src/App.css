@@ -12,81 +12,134 @@ body {
   padding: 20px;
 }
 
-/* ── Header ──────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════════
+   HEADER  —  solid gradient (no glass / no blur → no white-bleed issue)
+═══════════════════════════════════════════════════════════════════════════════ */
 .app-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 20px;
+  padding: 18px 28px;
+  margin-bottom: 20px;
+  /* Solid — no backdrop-filter so the white content card below never bleeds in */
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border-radius: 18px;
+  box-shadow: 0 6px 30px rgba(79, 70, 229, 0.45);
   color: white;
-  margin-bottom: 24px;
-  padding: 20px 28px;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(12px);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  gap: 16px;
   flex-wrap: wrap;
 }
 
-.header-left h1 { font-size: 1.85rem; margin-bottom: 4px; font-weight: 800; }
-.header-left p  { font-size: 0.9rem; opacity: 0.85; }
+/* ── Brand (left) ─────────────────────────────────────────────────────────── */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
 
+.header-left h1 {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  margin-bottom: 3px;
+}
+
+.header-left p {
+  font-size: 0.82rem;
+  opacity: 0.75;
+}
+
+/* ── Right side (user + actions) ──────────────────────────────────────────── */
 .header-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  flex-shrink: 0;
   flex-wrap: wrap;
 }
 
-.user-badge { display: flex; align-items: center; gap: 8px; }
-.user-name  { font-weight: 600; font-size: 0.9rem; }
+/* User pill */
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 8px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 30px;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
 
 .role-pill {
-  padding: 4px 12px;
+  padding: 3px 10px;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-}
-.role-pill.admin { background: #dc3545; color: white; }
-.role-pill.user  { background: rgba(255,255,255,0.25); color: white; border: 1px solid rgba(255,255,255,0.4); }
-
-.logout-btn {
-  padding: 8px 16px;
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.4);
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.88rem;
-  transition: all 0.2s;
   white-space: nowrap;
-  min-height: 38px;
 }
-.logout-btn:hover { background: rgba(255,255,255,0.28); transform: translateY(-1px); }
+.role-pill.admin { background: #ff4d6d; color: white; }
+.role-pill.user  { background: rgba(255,255,255,0.22); color: white; border: 1px solid rgba(255,255,255,0.35); }
 
+/* Action buttons group */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ── Shared nav-button base (logout + api-docs) ───────────────────────────── */
+.logout-btn,
 .api-docs-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 8px 14px;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.35);
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
+  gap: 6px;
+  padding: 8px 16px;
+  min-height: 38px;
+  border-radius: 10px;
   font-weight: 600;
-  font-size: 0.88rem;
-  text-decoration: none;
+  font-size: 0.85rem;
+  cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
-  min-height: 38px;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.13);
+  color: white;
 }
-.api-docs-btn:hover { background: rgba(255,255,255,0.25); transform: translateY(-1px); color: white; }
 
-/* ── Tabs ────────────────────────────────────────────────────────────────────── */
+.api-docs-btn:hover {
+  background: rgba(255, 255, 255, 0.26);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
+  color: white;
+}
+
+/* Logout gets a distinct red tint so it's unmistakable */
+.logout-btn {
+  background: rgba(239, 68, 68, 0.28);
+  border-color: rgba(252, 130, 130, 0.45);
+}
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.48);
+  border-color: rgba(252, 130, 130, 0.7);
+  transform: translateY(-1px);
+}
+
+/* btn-label spans — always visible (no more icon-only mode) */
+.btn-label { /* just a passthrough span — no display:none anywhere */ }
+
+/* ── Tabs ─────────────────────────────────────────────────────────────────── */
 .tabs {
   display: flex;
   gap: 10px;
@@ -112,9 +165,9 @@ body {
   min-height: 46px;
 }
 .tab:hover  { background: rgba(255, 255, 255, 0.32); transform: translateY(-2px); }
-.tab.active { background: white; color: #667eea; }
+.tab.active { background: white; color: #4f46e5; }
 
-/* ── Content card ────────────────────────────────────────────────────────────── */
+/* ── Content card ─────────────────────────────────────────────────────────── */
 .content {
   background: white;
   border-radius: 20px;
@@ -133,7 +186,7 @@ body {
   font-weight: bold;
 }
 
-/* ── Error toast ─────────────────────────────────────────────────────────────── */
+/* ── Error toast ──────────────────────────────────────────────────────────── */
 .error-toast {
   background: #dc3545;
   color: white;
@@ -144,78 +197,106 @@ body {
   text-align: center;
   animation: slideDown 0.3s ease;
 }
-
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Tablet (≤ 1024px) ───────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════════
+   TABLET  (≤ 1024px)
+═══════════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 1024px) {
   .App { padding: 16px; }
-  .app-header { padding: 18px 22px; }
-  .header-left h1 { font-size: 1.55rem; }
+  .app-header { padding: 16px 22px; }
+  .header-left h1 { font-size: 1.45rem; }
   .content { padding: 22px; }
 }
 
-/* ── Mobile (≤ 768px) ────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MOBILE  (≤ 768px)
+   Layout:  Row 1 — full-width brand
+            Row 2 — user badge (left)  |  action buttons (right)
+   Labels are ALWAYS visible — no icon-only mode
+═══════════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
   .App { padding: 12px; }
 
   .app-header {
-    padding: 16px 18px;
+    flex-direction: column;      /* stack brand row then controls row */
+    align-items: stretch;
+    padding: 14px 16px;
     gap: 12px;
     border-radius: 16px;
     margin-bottom: 16px;
   }
 
-  .header-left h1 { font-size: 1.25rem; margin-bottom: 2px; }
-  .header-left p  { font-size: 0.8rem; }
+  /* Brand row — icon + text side by side */
+  .header-left h1 { font-size: 1.2rem; margin-bottom: 2px; }
+  .header-left p  { font-size: 0.76rem; }
 
+  /* Controls row — user badge left, actions right */
   .header-right {
-    width: 100%;
+    display: flex;
+    align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 10px;
+    flex-wrap: nowrap;
+    width: 100%;
   }
 
-  .user-badge { gap: 6px; }
-  .user-name  { font-size: 0.82rem; }
-  .role-pill  { font-size: 0.68rem; padding: 3px 9px; }
-
-  .logout-btn { padding: 8px 12px; font-size: 0.82rem; }
-
-  .tabs {
-    justify-content: flex-start;
-    gap: 8px;
-    margin-bottom: 16px;
+  .user-badge {
+    flex-shrink: 1;
+    min-width: 0;
+    padding: 5px 12px 5px 7px;
   }
-  .tab {
-    padding: 10px 18px;
-    font-size: 0.9rem;
-    border-radius: 10px;
-    min-height: 42px;
+  .user-name  { font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
+  .role-pill  { font-size: 0.68rem; padding: 3px 8px; flex-shrink: 0; }
+
+  .header-actions {
+    flex-shrink: 0;
+    gap: 6px;
+    flex-wrap: nowrap;
   }
 
-  .content {
-    padding: 14px;
-    border-radius: 16px;
-    min-height: auto;
+  .logout-btn,
+  .api-docs-btn {
+    padding: 7px 12px;
+    font-size: 0.8rem;
+    gap: 5px;
+    min-height: 36px;
+    border-radius: 9px;
   }
+
+  .tabs { justify-content: flex-start; gap: 8px; margin-bottom: 16px; }
+  .tab  { padding: 10px 18px; font-size: 0.9rem; border-radius: 10px; min-height: 42px; }
+  .content { padding: 14px; border-radius: 16px; min-height: auto; }
 }
 
-/* ── Small mobile (≤ 480px) ──────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SMALL MOBILE  (≤ 480px)
+   Still show all labels — just tighter spacing and smaller font
+═══════════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 480px) {
   .App { padding: 10px; }
 
-  .app-header {
-    padding: 14px 14px;
-    border-radius: 14px;
+  .app-header { padding: 12px 14px; border-radius: 14px; }
+
+  .header-left h1 { font-size: 1.05rem; }
+  .header-left p  { display: none; }   /* hide subtitle to save space */
+
+  .header-right { gap: 8px; }
+
+  .user-name { max-width: 72px; font-size: 0.78rem; }
+
+  /* Buttons: slightly smaller but labels always shown */
+  .logout-btn,
+  .api-docs-btn {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    gap: 4px;
+    min-height: 34px;
   }
 
-  .header-left h1 { font-size: 1.1rem; }
-  .header-left p  { display: none; } /* hide subtitle on very small screens */
-
   .content { padding: 12px; border-radius: 14px; }
-
   .tab { padding: 9px 14px; font-size: 0.85rem; }
 }
