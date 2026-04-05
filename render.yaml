@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: advtaskmanager
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /actuator/health
+    autoDeploy: true
+
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+      # --- Database: enter real values in Render dashboard -> Environment ---
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+
+      # --- JWT: enter a strong secret in Render dashboard ---
+      - key: JWT_SECRET
+        sync: false
+
+      # --- AI / Groq: enter your gsk_... key in Render dashboard ---
+      - key: OPENAI_API_KEY
+        sync: false
+
+      # These two are not secrets, safe to commit
+      - key: AI_BASE_URL
+        value: https://api.groq.com/openai/v1/chat/completions
+      - key: AI_MODEL
+        value: llama-3.3-70b-versatile
+
+      # --- CORS: enter your Vercel URL in Render dashboard ---
+      # e.g.  https://advtaskmanager.vercel.app,http://localhost:5173
+      - key: ALLOWED_ORIGINS
+        sync: false
