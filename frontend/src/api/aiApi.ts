@@ -1,6 +1,7 @@
 import { authHeaders, handleResponse } from './api';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const _rawBase = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api').replace(/\/$/, '');
+const API_BASE_URL = _rawBase.endsWith('/api') ? _rawBase : `${_rawBase}/api`;
 
 export interface AIChatResponse {
   reply: string;

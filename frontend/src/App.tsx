@@ -13,8 +13,10 @@ import ImportExport from './components/ImportExport';
 import FilterBar from './components/FilterBar';
 import TaskDetailModal from './components/TaskDetailModal';
 
-// Derive backend root URL from the API base (strip "/api" suffix)
-const BACKEND_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api').replace(/\/api$/, '');
+// Derive backend root URL from the API base (strip "/api" suffix if present)
+const _rawApiBase = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api').replace(/\/$/, '');
+const _apiBase   = _rawApiBase.endsWith('/api') ? _rawApiBase : `${_rawApiBase}/api`;
+const BACKEND_URL = _apiBase.replace(/\/api$/, '');
 const SWAGGER_URL = `${BACKEND_URL}/swagger-ui/index.html`;
 
 // ── Main app (only shown when authenticated) ──────────────────────────────────

@@ -1,8 +1,11 @@
 import type { AuthResponse } from '../types/types';
 import type { TaskFilterParams } from '../types/types';
 
-// API Base URL — reads from env var in production, falls back to localhost for dev
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+// API Base URL — reads from env var in production, falls back to localhost for dev.
+// Guard: if the env var is set without the /api suffix (e.g. https://host.onrender.com)
+// we append it automatically so no API call ever hits the wrong path.
+const _rawBase = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api').replace(/\/$/, '');
+const API_BASE_URL = _rawBase.endsWith('/api') ? _rawBase : `${_rawBase}/api`;
 
 // ── Auth Headers (exported for reuse in aiApi.ts) ─────────────────────────────
 export const authHeaders = () => {
