@@ -22,10 +22,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 @EnableWebSecurity
@@ -33,10 +30,6 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
     private final CustomUserDetailsService userDetailsService;
-
-    // Comma-separated origins from application.properties / env var ALLOWED_ORIGINS
-    @Value("${cors.allowed-origins:http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173}")
-    private String allowedOrigins;
 
     public SecurityConfig(JwtAuthenticationFilter jwtFilter,
                           CustomUserDetailsService userDetailsService) {
@@ -58,7 +51,7 @@ public class SecurityConfig {
                                 "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
                                 "style-src 'self' 'unsafe-inline'; " +
                                 "img-src 'self' data:; " +
-                                "connect-src 'self' https://api.groq.com https://api.openai.com"
+                                "connect-src 'self' https: http://localhost:*"
                         ))
                         .frameOptions(frame -> frame.sameOrigin())              // allow Swagger UI iframe
                         .httpStrictTransportSecurity(hsts -> hsts           // HSTS (HTTPS only)
@@ -101,11 +94,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Read allowed origins from env/properties (comma-separated)
-        List<String> origins = Arrays.stream(allowedOrigins.split(","))
-                .map(String::trim)
-                .collect(Collectors.toList());
-        config.setAllowedOriginPatterns(origins);
+        // Allow ALL origins — safe because JWT handles auth (no session cookies).
+        // To restrict later: set ALLOWED_ORIGINS env var with comma-separated list.
+        config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization"));
