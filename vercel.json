@@ -1,7 +1,7 @@
 {
-  "buildCommand": "cd frontend && npm ci && npm run build",
+  "installCommand": "cd frontend && npm install",
+  "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/dist",
-  "installCommand": "echo 'skip root install'",
   "framework": null,
   "build": {
     "env": {
@@ -15,4 +15,3 @@
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
-
