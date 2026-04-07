@@ -15,12 +15,12 @@
 
 11) for personal use task manager should be like what you are already using only personal no users assigned to etcc give that app demo to assistant to ask to replicate the same
 
-12) there was some SD's like on first request after some idle time the will be in ideal or hibernate mode once on first request it will wakeup (may be 1st request will take some time)
+12) there was some SD's like on first request after some idle time the will be in ideal or hibernate mode once on first request it will wakeup (may be 1st request will take some time) cold start and keep app in warm via the actuator health pinf every 10mins etc.
 13) when ticket moved to done some celebration stuff like flying cones or colours smtg..
 
 
 14) when we opend the task details we have a provision to edit the ticket detaisl like tilte, descritption, due date etc..
-15) when opend in punny mobile got that can;t able to login prbls have to check that
+15) when opened in punny mobile got that can't able to login prbls have to check that
 > What's already **done** → what's worth building next, why it matters for learning,
 > and what it adds to the app.  Ordered by impact × feasibility.
 
