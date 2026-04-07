@@ -9,24 +9,22 @@ Your app has **3 pieces**. Each goes to a different free service:
 │  YOUR APP                                               │
 │                                                         │
 │  1. React Frontend  ──► VERCEL         (free)           │
-│  2. Spring Boot API ──► RAILWAY        (free)           │
+│  2. Spring Boot API ──► RENDER         (free)           │
 │  3. PostgreSQL DB   ──► NEON.TECH      (free)           │
 └─────────────────────────────────────────────────────────┘
 ```
 
-> **Why not all Vercel?** Vercel only runs JavaScript. Your backend is Java (Spring Boot) — it needs Railway or Render.
+> **Why not all Vercel?** Vercel only runs JavaScript. Your backend is Java (Spring Boot) — it needs Render.
 
 ---
 
 ## 📋 Your Environment Variables (fill these in as you go)
 
-Keep this open and fill in the values as you complete each step:
-
 ```
-DATABASE_URL  = <get from Neon — Step 1>
-JWT_SECRET    = advTaskManagerJWTSecretKeyForAuthentication2024LongEnoughForHS256
-OPENAI_API_KEY = <your-groq-api-key-from-console.groq.com>
-BACKEND_URL   = <get from Railway — Step 2>
+DATABASE_URL     = <get from Neon — Step 1>
+JWT_SECRET       = advTaskManagerJWTSecretKeyForAuthentication2024LongEnoughForHS256
+OPENAI_API_KEY   = <your-groq-api-key-from-console.groq.com>
+BACKEND_URL      = <get from Render — Step 2>   e.g. https://advtaskmanager.onrender.com
 ```
 
 ---
@@ -34,111 +32,91 @@ BACKEND_URL   = <get from Railway — Step 2>
 ## STEP 1 — Set up the Database (Neon.tech — FREE)
 
 1. Go to **https://neon.tech** → Sign up (use GitHub login)
-2. Click **"New Project"**
-3. Name it: `taskmanager`
-4. Click **Create Project**
-5. Copy the **Connection String** — it looks like:
+2. Click **"New Project"** → name it `taskmanager` → **Create Project**
+3. Copy the **Connection String**:
    ```
    postgresql://neondb_owner:SOMEPASSWORD@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
    ```
-6. 📝 **Save this as your `DATABASE_URL`**
+4. 📝 **Save this as your `DATABASE_URL`**
 
 ---
 
-## STEP 2 — Deploy the Backend (Railway — FREE)
+## STEP 2 — Deploy the Backend (Render — FREE)
 
-1. Go to **https://railway.app** → Sign up (use GitHub login)
-2. Click **"New Project" → "Deploy from GitHub repo"**
-3. Select your **advtaskmanager** repository
-4. Railway will auto-detect Spring Boot ✅
-5. Go to your project → **Variables** tab → Add these one by one:
+1. Go to **https://render.com** → Sign up with GitHub
+2. Click **"New +" → "Web Service"** → connect **advtaskmanager** repo
+3. Render detects `render.yaml` automatically → click **Apply**
+4. Go to **Environment → Environment Variables** and add:
 
-   | Variable Name | Value |
-   |---------------|-------|
+   | Variable | Value |
+   |----------|-------|
    | `SPRING_PROFILES_ACTIVE` | `prod` |
-   | `DB_URL` | your Neon connection string from Step 1 |
-   | `DB_USERNAME` | your Neon username (in the connection string) |
-   | `DB_PASSWORD` | your Neon password (in the connection string) |
+   | `DB_URL` | your Neon connection string |
+   | `DB_USERNAME` | your Neon username |
+   | `DB_PASSWORD` | your Neon password |
    | `JWT_SECRET` | `advTaskManagerJWTSecretKeyForAuthentication2024LongEnoughForHS256` |
-   | `OPENAI_API_KEY` | `<your-groq-api-key-from-console.groq.com>` |
+   | `OPENAI_API_KEY` | `gsk_...` (from console.groq.com) |
    | `AI_BASE_URL` | `https://api.groq.com/openai/v1/chat/completions` |
    | `AI_MODEL` | `llama-3.3-70b-versatile` |
-   | `PORT` | `8080` |
-   | `ALLOWED_ORIGINS` | *(add after Step 3 — paste your Vercel URL here)* |
+   | `ALLOWED_ORIGINS` | *(add after Step 3 — your Vercel URL)* |
 
-6. Go to **Settings → Networking → Generate Domain**
-7. 📝 **Save the Railway URL** — it looks like `https://advtaskmanager-production-xxxx.railway.app`
-
-   > ✅ Wait 2-3 minutes for it to build. Check logs in the **Logs** tab.
-
-8. **Test it**: Open `https://YOUR-RAILWAY-URL.railway.app/actuator/health` in browser → should show `{"status":"UP"}`
+5. Render URL will be: `https://advtaskmanager.onrender.com`
+6. **Test**: `https://advtaskmanager.onrender.com/actuator/health` → `{"status":"UP"}`
 
 ---
 
-## STEP 3 — Deploy the Frontend (Vercel — FREE)
+## STEP 3 — Update the Frontend (Vercel — FREE)
 
-1. Go to **https://vercel.com** → Sign up (use GitHub login)
-2. Click **"Add New → Project"**
-3. Select your **advtaskmanager** repository
-4. **IMPORTANT** — Vercel will ask for settings. Fill in:
+### ⚠️ Key Step — this is why Vercel was still using Railway
 
-   | Setting | Value |
-   |---------|-------|
-   | **Root Directory** | `frontend` |
-   | **Framework Preset** | `Vite` |
-   | **Build Command** | `npm run build` |
-   | **Output Directory** | `dist` |
+The `VITE_API_BASE_URL` env var in **Vercel dashboard** overrides the `.env.production` file.
+You MUST update it there:
 
-5. **Add Environment Variable** (click "Environment Variables" before deploying):
+1. Go to **https://vercel.com** → open your **advtaskmanager** project
+2. **Settings → Environment Variables**
+3. Find `VITE_API_BASE_URL` → **Edit** (or Add if missing):
 
    | Name | Value |
    |------|-------|
-   | `VITE_API_BASE_URL` | `https://YOUR-RAILWAY-URL.railway.app/api` |
+   | `VITE_API_BASE_URL` | `https://advtaskmanager.onrender.com/api` |
 
-   > Replace `YOUR-RAILWAY-URL` with the actual URL from Step 2
+4. **Deployments → "..." menu → Redeploy** the latest build
+5. Wait ~1 minute — done ✅
 
-6. Click **Deploy** → wait ~1 minute
-7. Vercel gives you a URL like: `https://advtaskmanager-xyz.vercel.app`
+> 💡 **First time on Vercel?**
+> - "Add New → Project" → select repo → Root Directory = `frontend` → Framework = `Vite`
+> - Add `VITE_API_BASE_URL` before clicking Deploy
 
 ---
 
 ## STEP 4 — Tell the Backend Your Vercel URL (CORS)
 
-Go back to **Railway → Your Project → Variables** and add **one more variable**:
+**Render → advtaskmanager → Environment → update:**
 
-| Variable Name | Value |
-|---------------|-------|
-| `ALLOWED_ORIGINS` | `https://advtaskmanager-xyz.vercel.app,http://localhost:5173` |
+| Variable | Value |
+|----------|-------|
+| `ALLOWED_ORIGINS` | `https://advtaskmanager.vercel.app,http://localhost:5173` |
 
-> Replace `advtaskmanager-xyz.vercel.app` with your actual Vercel URL from Step 3.
-
-Railway will auto-redeploy. **No code changes needed.** ✅
+Render auto-redeploys. ✅
 
 ---
 
 ## STEP 5 — Test Everything
 
-Open your Vercel URL and:
+Open your Vercel URL:
 - ✅ Login: `admin@gmail.com` / `admin123`
-- ✅ Create a task
-- ✅ Create a user
+- ✅ Create a task, assign a user
 - ✅ Try the AI assistant
 
 ---
 
-## 🔁 Workflow After This (making code changes)
-
-```
-You write code → git push → Railway & Vercel auto-redeploy ✅
-```
-
-That's it. No manual steps needed after the first setup.
+## 🔁 Making Code Changes
 
 ```bash
 git add .
 git commit -m "your change"
 git push origin main
-# Both Railway (backend) and Vercel (frontend) redeploy automatically
+# Render (backend) and Vercel (frontend) both redeploy automatically ✅
 ```
 
 ---
@@ -147,25 +125,23 @@ git push origin main
 
 | Problem | Fix |
 |---------|-----|
-| Backend health check fails | Check Railway logs → Variables tab (wrong DB URL?) |
-| Frontend shows blank page | Check Vercel logs → Environment Variables (wrong VITE_API_BASE_URL?) |
-| Login fails on live site | CORS not set — did you add Vercel URL to SecurityConfig.java? |
-| DB connection error | Check Neon connection string — copy it exactly with `?sslmode=require` |
-| Railway build fails | Make sure `pom.xml` is in the root folder (not inside a subfolder) |
+| Frontend still calls Railway URL | Vercel → Settings → Env Vars → update `VITE_API_BASE_URL` → Redeploy |
+| Backend health check fails | Render Logs → check DB_URL / DB_PASSWORD correct? |
+| Login fails (CORS error) | Render → `ALLOWED_ORIGINS` must include your exact Vercel URL |
+| DB connection error | Neon connection string must end with `?sslmode=require` |
+| Render cold start (slow first load) | Free tier sleeps after 15 min — first request ~30s, normal |
+| Render build fails | `Dockerfile` must be in root folder of repo |
 
 ---
 
 ## 💡 Quick Summary
 
 ```
-Step 1: neon.tech     → Create DB    → Copy connection string
-Step 2: railway.app   → Deploy API   → Set 9 env vars → Copy Railway URL
-Step 3: vercel.com    → Deploy UI    → Set VITE_API_BASE_URL = Railway URL
-Step 4: Add Vercel URL to SecurityConfig.java CORS → git push
+Step 1: neon.tech   → Create DB       → copy connection string
+Step 2: render.com  → Deploy backend  → set env vars → get Render URL
+Step 3: vercel.com  → Update VITE_API_BASE_URL to Render URL → Redeploy
+Step 4: render.com  → ALLOWED_ORIGINS = your Vercel URL → auto-redeploy
 Step 5: Done! 🎉
 ```
 
 **Total time: ~20 minutes**
-
-
-
