@@ -19,9 +19,18 @@ const _apiBase   = _rawApiBase.endsWith('/api') ? _rawApiBase : `${_rawApiBase}/
 const BACKEND_URL = _apiBase.replace(/\/api$/, '');
 const SWAGGER_URL = `${BACKEND_URL}/swagger-ui/index.html`;
 
+type Theme = 'light' | 'dark';
+
+function getInitialTheme(): Theme {
+  const stored = localStorage.getItem('theme');
+  if (stored === 'light' || stored === 'dark') return stored;
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
 // ── Main app (only shown when authenticated) ──────────────────────────────────
 function MainApp() {
   const { user, logout } = useAuth();
+  const [theme, setTheme] = useState<Theme>(() => getInitialTheme());
   const [users, setUsers]               = useState<User[]>([]);
   const [tasks, setTasks]               = useState<Task[]>([]);
   const [loading, setLoading]           = useState(true);   // only true on first load
@@ -70,6 +79,11 @@ function MainApp() {
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   // Filter changed by user — update ref (no re-render) then silently refresh tasks
   const handleFilterChange = useCallback((params: TaskFilterParams) => {
@@ -148,6 +162,14 @@ function MainApp() {
           </div>
           <div className="header-actions">
             {isAdmin && <ImportExport onImportComplete={loadData} />}
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={() => setTheme(t => (t === 'dark' ? 'light' : 'dark'))}
+              title="Toggle theme"
+            >
+              {theme === 'dark' ? '🌙' : '☀️'} <span className="btn-label">{theme === 'dark' ? 'Dark' : 'Light'}</span>
+            </button>
             <a
               className="api-docs-btn"
               href={SWAGGER_URL}

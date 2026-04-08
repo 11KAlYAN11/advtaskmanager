@@ -48,7 +48,8 @@
   right: 28px;
   width: 390px;
   max-height: 570px;
-  background: white;
+  background: var(--surface-solid);
+  border: 1px solid var(--surface-border);
   border-radius: 20px;
   box-shadow: 0 16px 56px rgba(0, 0, 0, 0.22), 0 2px 8px rgba(102, 126, 234, 0.15);
   z-index: 999;
@@ -101,7 +102,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: #f9fafb;
+  background: var(--surface-2);
 }
 
 .ai-msg {
@@ -137,10 +138,10 @@
 }
 
 .ai-msg--ai .ai-msg-text {
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--surface-solid);
+  border: 1px solid var(--surface-border);
   border-radius: 4px 14px 14px 14px;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .ai-msg--user .ai-msg-text {
@@ -185,18 +186,18 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  background: #f9fafb;
-  border-top: 1px solid #e5e7eb;
+  background: var(--surface-2);
+  border-top: 1px solid var(--surface-border);
 }
 
 .ai-suggestion {
-  background: white;
-  border: 1px solid #d1d5db;
+  background: var(--surface-solid);
+  border: 1px solid var(--surface-border);
   border-radius: 20px;
   padding: 5px 12px;
   font-size: 0.78rem;
   cursor: pointer;
-  color: #374151;
+  color: var(--text);
   transition: all 0.15s;
   white-space: nowrap;
 }
@@ -212,15 +213,15 @@
   display: flex;
   gap: 8px;
   padding: 12px;
-  background: white;
-  border-top: 1px solid #e5e7eb;
+  background: var(--surface-solid);
+  border-top: 1px solid var(--surface-border);
   align-items: flex-end;
 }
 
 .ai-input {
   flex: 1;
   padding: 10px 14px;
-  border: 1.5px solid #e5e7eb;
+  border: 1px solid var(--input-border);
   border-radius: 12px;
   font-size: 0.9rem;
   resize: none;
@@ -228,6 +229,8 @@
   font-family: inherit;
   line-height: 1.4;
   transition: border-color 0.2s;
+  background: var(--input-bg);
+  color: var(--text);
 }
 
 .ai-input:focus {

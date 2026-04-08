@@ -2,15 +2,25 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Force light mode for native form elements (inputs, selects, etc.)
-     Without this, dark-mode OS renders inputs with light text on white bg → invisible */
-  color-scheme: light;
-
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   font-size: 16px;
   line-height: 1.5;
-  color: #1a1a2e;
-  background-color: #fff;
+  color-scheme: light dark;
+
+  /* ── Theme tokens (Light defaults) ─────────────────────────────────────── */
+  --bg: #f6f7fb;
+  --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --surface: rgba(255, 255, 255, 0.92);
+  --surface-solid: #ffffff;
+  --surface-2: rgba(255, 255, 255, 0.72);
+  --surface-border: rgba(17, 24, 39, 0.08);
+  --text: #111827;
+  --muted: #6b7280;
+  --muted-2: rgba(17, 24, 39, 0.55);
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  --focus: rgba(102, 126, 234, 0.18);
+  --input-bg: rgba(255, 255, 255, 0.85);
+  --input-border: rgba(17, 24, 39, 0.14);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -18,7 +28,31 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-body { margin: 0; }
+/* Dark theme overrides */
+:root[data-theme="dark"] {
+  --bg: #0b1020;
+  --bg-gradient: radial-gradient(1200px circle at 15% 10%, rgba(124, 58, 237, 0.35), transparent 55%),
+                 radial-gradient(900px circle at 85% 20%, rgba(79, 70, 229, 0.35), transparent 55%),
+                 linear-gradient(135deg, #0b1020 0%, #0a122a 100%);
+  --surface: rgba(17, 24, 39, 0.78);
+  --surface-solid: #111827;
+  --surface-2: rgba(17, 24, 39, 0.55);
+  --surface-border: rgba(255, 255, 255, 0.10);
+  --text: #e5e7eb;
+  --muted: rgba(229, 231, 235, 0.70);
+  --muted-2: rgba(229, 231, 235, 0.55);
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+  --focus: rgba(124, 58, 237, 0.25);
+  --input-bg: rgba(17, 24, 39, 0.55);
+  --input-border: rgba(255, 255, 255, 0.14);
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  background: var(--bg-gradient);
+  min-height: 100vh;
+}
 
 #root {
   width: 100%;
@@ -33,5 +67,4 @@ input, textarea, select, button {
   font-family: inherit;
   font-size: inherit;
   color: inherit;
-  color-scheme: light;   /* force light styling on native controls */
 }

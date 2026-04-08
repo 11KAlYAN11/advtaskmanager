@@ -5,10 +5,10 @@
   gap: 10px;
   flex-wrap: wrap;
   padding: 14px 18px;
-  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+  background: var(--surface-2);
   border-radius: 14px;
-  border: 1.5px solid #e0e7ff;
-  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.07);
+  border: 1px solid var(--surface-border);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   margin-bottom: 18px;
 }
 
@@ -31,12 +31,11 @@
 .filter-search {
   width: 100%;
   padding: 9px 34px 9px 34px;
-  border: 1.5px solid #d1d5db;
+  border: 1px solid var(--input-border);
   border-radius: 10px;
   font-size: 0.9rem;
-  background: white;
-  color: #1a1a2e;
-  color-scheme: light;
+  background: var(--input-bg);
+  color: var(--text);
   outline: none;
   font-family: inherit;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -44,7 +43,7 @@
 
 .filter-search:focus {
   border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 0 0 3px var(--focus);
 }
 
 .filter-search::placeholder { color: #9ca3af; }
@@ -67,12 +66,11 @@
 /* ── Dropdowns ───────────────────────────────────────────────────────────────── */
 .filter-select {
   padding: 9px 12px;
-  border: 1.5px solid #d1d5db;
+  border: 1px solid var(--input-border);
   border-radius: 10px;
   font-size: 0.88rem;
-  background: white;
-  color: #1a1a2e;
-  color-scheme: light;
+  background: var(--input-bg);
+  color: var(--text);
   cursor: pointer;
   outline: none;
   font-family: inherit;
@@ -82,7 +80,7 @@
 }
 .filter-select:focus {
   border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 0 0 3px var(--focus);
 }
 
 /* ── Clear button ────────────────────────────────────────────────────────────── */

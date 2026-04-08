@@ -2,8 +2,7 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
+  /* theme background handled in index.css */
 }
 
 .App {
@@ -98,6 +97,29 @@ body {
   flex-wrap: wrap;
 }
 
+/* Theme toggle button */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  min-height: 38px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.13);
+  color: white;
+}
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.26);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
+}
+
 /* ── Shared nav-button base (logout + api-docs) ───────────────────────────── */
 .logout-btn,
 .api-docs-btn {
@@ -169,11 +191,14 @@ body {
 
 /* ── Content card ─────────────────────────────────────────────────────────── */
 .content {
-  background: white;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--surface-border);
   border-radius: 20px;
   padding: 28px;
   min-height: 500px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
 }
 
 .loading {

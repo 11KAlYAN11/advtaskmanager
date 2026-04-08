@@ -20,7 +20,7 @@
   bottom: 0;
   width: 420px;
   max-width: 95vw;
-  background: #fff;
+  background: var(--surface-solid);
   z-index: 901;
   display: flex;
   flex-direction: column;
@@ -89,7 +89,7 @@
   margin: 0 0 14px 0;
   font-size: 1.2rem;
   font-weight: 800;
-  color: #1a1a2e;
+  color: var(--text);
   line-height: 1.4;
   word-break: break-word;
 }
@@ -116,7 +116,7 @@
 /* ── Sections ────────────────────────────────────────────────────────────────── */
 .detail-section {
   padding: 14px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--surface-border);
 }
 .detail-section:last-child { border-bottom: none; }
 
@@ -126,13 +126,13 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  color: #888;
+  color: var(--muted-2);
 }
 
 .detail-text {
   margin: 0;
   font-size: 0.92rem;
-  color: #333;
+  color: var(--text);
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
@@ -168,12 +168,12 @@
 
 .assignee-role {
   font-size: 0.78rem;
-  color: #888;
+  color: var(--muted-2);
   font-weight: 600;
 }
 
 /* ── Timestamps ──────────────────────────────────────────────────────────────── */
-.detail-timestamps { background: #f8f9ff; border-radius: 10px; padding: 12px 14px; margin-top: 4px; }
+.detail-timestamps { background: var(--surface-2); border-radius: 10px; padding: 12px 14px; margin-top: 4px; border: 1px solid var(--surface-border); }
 
 .timestamp-row {
   display: flex;
@@ -185,14 +185,14 @@
 
 .timestamp-label {
   font-size: 0.78rem;
-  color: #888;
+  color: var(--muted-2);
   font-weight: 600;
   white-space: nowrap;
 }
 
 .timestamp-value {
   font-size: 0.82rem;
-  color: #555;
+  color: var(--muted);
   font-weight: 500;
   text-align: right;
 }
@@ -200,8 +200,8 @@
 /* ── Footer ──────────────────────────────────────────────────────────────────── */
 .modal-footer {
   padding: 14px 20px;
-  border-top: 1px solid #f0f0f0;
-  background: #fafafa;
+  border-top: 1px solid var(--surface-border);
+  background: var(--surface-2);
   flex-shrink: 0;
 }
 
