@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import { aiAPI } from '../api/aiApi';
 import './AIAssistant.css';
+import type { Task, User } from '../types/types';
 
 interface Message {
   role: 'user' | 'ai';
@@ -8,25 +9,58 @@ interface Message {
   isError?: boolean;
 }
 
-// ── Gemini-style 4-pointed sparkle SVG ───────────────────────────────────────
-const SparkleIcon = ({ size = 22, color = 'white' }: { size?: number; color?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    {/* Large center diamond-star */}
+// ── OpenAI-style icon (Tabler "brand-openai"), tinted light-blue ────────────
+const OpenAIIcon = ({ size = 22, color = '#93c5fd' }: { size?: number; color?: string }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path
-      d="M12 2C12 2 13.2 8.8 19 12C13.2 15.2 12 22 12 22C12 22 10.8 15.2 5 12C10.8 8.8 12 2 12 2Z"
-      fill={color}
+      d="M11.217 19.384a3.501 3.501 0 0 0 6.783 -1.217v-5.167l-6 -3.35"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
-    {/* Small accent star — top right */}
     <path
-      d="M20 3C20 3 20.7 5.8 22.5 6.5C20.7 7.2 20 10 20 10C20 10 19.3 7.2 17.5 6.5C19.3 5.8 20 3 20 3Z"
-      fill={color}
-      opacity="0.72"
+      d="M5.214 15.014a3.501 3.501 0 0 0 4.446 5.266l4.34 -2.534v-6.946"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
-    {/* Tiny accent dot — bottom left */}
     <path
-      d="M4 14C4 14 4.5 16 6 16.5C4.5 17 4 19 4 19C4 19 3.5 17 2 16.5C3.5 16 4 14 4 14Z"
-      fill={color}
-      opacity="0.5"
+      d="M6 7.63c-1.391 -.236 -2.787 .395 -3.534 1.689a3.474 3.474 0 0 0 1.271 4.745l4.263 2.514l6 -3.348"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M12.783 4.616a3.501 3.501 0 0 0 -6.783 1.217v5.067l6 3.45"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M18.786 8.986a3.501 3.501 0 0 0 -4.446 -5.266l-4.34 2.534v6.946"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M18 16.302c1.391 .236 2.787 -.395 3.534 -1.689a3.474 3.474 0 0 0 -1.271 -4.745l-4.308 -2.514l-5.955 3.42"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 );
@@ -38,27 +72,56 @@ const CloseIcon = () => (
   </svg>
 );
 
-const SUGGESTIONS = [
-  '📝 Create a task "Fix login bug"',
-  '🔄 Move task 1 to IN_PROGRESS',
-  '👁️ Move task 2 to REVIEW',
-  '👤 Assign task 1 to user 1',
-  '✅ Mark task 3 as DONE',
-  '📋 Show me all tasks summary',
-];
+function buildSuggestions(tasks: Task[], users: User[]) {
+  const taskTitles = tasks.map(t => t.title).filter((t): t is string => typeof t === 'string' && t.trim().length > 0);
+  const userNames = users.map(u => u.name).filter((n): n is string => typeof n === 'string' && n.trim().length > 0);
+
+  const firstTask = taskTitles[0];
+  const secondTask = taskTitles[1];
+  const anyUser = userNames[0];
+
+  const base = [
+    '📝 Create a task "Fix login bug"',
+    '📋 Show me all tasks summary',
+    '🔎 Search tasks with "login"',
+  ];
+
+  const action = [
+    ...(firstTask ? [`🔄 Move task "${firstTask}" to IN_PROGRESS`] : []),
+    ...(secondTask ? [`👁️ Move task "${secondTask}" to REVIEW`] : []),
+    ...(firstTask && anyUser ? [`👤 Assign task "${firstTask}" to "${anyUser}"`] : []),
+    ...(firstTask ? [`✅ Mark task "${firstTask}" as DONE`] : []),
+  ];
+
+  // If there's nothing to act on yet, keep prompts generic (won't error).
+  if (action.length === 0) {
+    return [
+      ...base,
+      '➡️ Move task "ABC" to DONE',
+      '👤 Assign task "ABC" to user "XYZ"',
+      '🧾 Export all data as JSON',
+    ];
+  }
+
+  return [...base, ...action].slice(0, 6);
+}
 
 interface Props {
   onRefresh: () => void;  // called when AI performs a CRUD action
+  tasks?: Task[];
+  users?: User[];
 }
 
-export default function AIAssistant({ onRefresh }: Props) {
+export default function AIAssistant({ onRefresh, tasks = [], users = [] }: Props) {
   const [open, setOpen]         = useState(false);
   const [input, setInput]       = useState('');
   const [loading, setLoading]   = useState(false);
+  const suggestions = useMemo(() => buildSuggestions(tasks, users), [tasks, users]);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'ai',
-      text: "✦ Hi! I'm your AI Task Assistant.\n\nYou can ask me things like:\n• \"Create a task called Fix login bug\"\n• \"Move task 2 to REVIEW\"\n• \"Assign task 1 to John\"\n\nJust type naturally — I'll handle the rest! 🚀",
+      text:
+        "Hi! I'm your AI Task Assistant.\n\nTry prompts like:\n• \"Create a task called Fix login bug\"\n• \"Move task ABC to REVIEW\"\n• \"Assign task ABC to user XYZ\"\n\nTip: use the suggestions below — they adapt to your current tasks/users.",
     },
   ]);
 
@@ -112,7 +175,7 @@ export default function AIAssistant({ onRefresh }: Props) {
         title="AI Task Assistant"
         aria-label={open ? 'Close AI Assistant' : 'Open AI Assistant'}
       >
-        {open ? <CloseIcon /> : <SparkleIcon />}
+        {open ? <CloseIcon /> : <OpenAIIcon />}
       </button>
 
       {/* ── Chat panel ─────────────────────────────────────────────────── */}
@@ -121,7 +184,7 @@ export default function AIAssistant({ onRefresh }: Props) {
           {/* Header */}
           <div className="ai-header">
             <span className="ai-header-title">
-              <SparkleIcon size={17} />
+              <OpenAIIcon size={17} color="white" />
               AI Task Assistant
             </span>
             <span className="ai-badge">Groq · llama-3.3</span>
@@ -132,7 +195,7 @@ export default function AIAssistant({ onRefresh }: Props) {
             {messages.map((m, i) => (
               <div key={i} className={`ai-msg ai-msg--${m.role}${m.isError ? ' ai-msg--error' : ''}`}>
                 <span className="ai-msg-avatar">
-                  {m.role === 'ai' ? <SparkleIcon size={18} color="#7c6fcd" /> : '👤'}
+                  {m.role === 'ai' ? <OpenAIIcon size={18} color="#60a5fa" /> : '👤'}
                 </span>
                 <div className="ai-msg-text">{m.text}</div>
               </div>
@@ -140,7 +203,7 @@ export default function AIAssistant({ onRefresh }: Props) {
 
             {loading && (
               <div className="ai-msg ai-msg--ai">
-                <span className="ai-msg-avatar"><SparkleIcon size={18} color="#7c6fcd" /></span>
+                <span className="ai-msg-avatar"><OpenAIIcon size={18} color="#60a5fa" /></span>
                 <div className="ai-msg-text ai-thinking">
                   <span /><span /><span />
                 </div>
@@ -153,7 +216,7 @@ export default function AIAssistant({ onRefresh }: Props) {
           {/* Quick suggestions */}
           {messages.length <= 1 && (
             <div className="ai-suggestions">
-              {SUGGESTIONS.map((s, i) => (
+              {suggestions.map((s, i) => (
                 <button key={i} className="ai-suggestion" onClick={() => send(s)}>
                   {s}
                 </button>

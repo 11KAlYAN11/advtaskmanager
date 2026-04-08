@@ -229,7 +229,7 @@ function MainApp() {
       </div>
 
       {/* ── AI Assistant floating widget ─────────────────────────────────── */}
-      <AIAssistant onRefresh={loadData} />
+      <AIAssistant onRefresh={loadData} tasks={tasks} users={users} />
 
       {/* ── Task Detail slide-over modal ─────────────────────────────────── */}
       <TaskDetailModal task={selectedTask} onClose={() => setSelectedTask(null)} />
