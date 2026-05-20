@@ -304,6 +304,7 @@ public class AIService {
                         "taskId", Map.of("type", "integer", "description", "ID of the task to delete")
                     ),
                     "required", List.of("taskId")
+
                 )
             ),
             tool("create_user", "Create a new user account (ADMIN only)",
