@@ -142,6 +142,15 @@ function MainApp() {
     }
   };
 
+  const handleTaskUpdated = async (updatedTask: Task) => {
+    // Update the task in the local state
+    setTasks(prev => prev.map(t => t.id === updatedTask.id ? updatedTask : t));
+    // Also update the selected task to show the latest changes
+    if (selectedTask?.id === updatedTask.id) {
+      setSelectedTask(updatedTask);
+    }
+  };
+
   if (loading) {
     return <div className="loading">⏳ Loading Task Manager…</div>;
   }
@@ -232,7 +241,11 @@ function MainApp() {
       <AIAssistant onRefresh={loadData} tasks={tasks} users={users} />
 
       {/* ── Task Detail slide-over modal ─────────────────────────────────── */}
-      <TaskDetailModal task={selectedTask} onClose={() => setSelectedTask(null)} />
+      <TaskDetailModal 
+        task={selectedTask} 
+        onClose={() => setSelectedTask(null)}
+        onTaskUpdated={handleTaskUpdated}
+      />
     </div>
   );
 }

@@ -57,6 +57,13 @@ public class TaskController {
         return taskService.updateStatus(taskId, status);
     }
 
+    // UPDATE TASK DETAILS (title, description, priority, dueDate)
+    @PutMapping("/{taskId}")
+    @Operation(summary = "Update task details (title, description, priority, dueDate, status)")
+    public Task updateTask(@PathVariable Long taskId, @RequestBody Task updates) {
+        return taskService.updateTask(taskId, updates);
+    }
+
     // GET TASKS BY USER
     @GetMapping("/user/{userId}")
     @Operation(summary = "Get tasks assigned to a specific user")

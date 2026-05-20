@@ -78,6 +78,31 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
+    // UPDATE TASK DETAILS (title, description, priority, dueDate)
+    public Task updateTask(Long taskId, Task updates) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+        
+        // Update only the provided fields
+        if (updates.getTitle() != null && !updates.getTitle().isBlank()) {
+            task.setTitle(updates.getTitle());
+        }
+        if (updates.getDescription() != null) {
+            task.setDescription(updates.getDescription());
+        }
+        if (updates.getPriority() != null) {
+            task.setPriority(updates.getPriority());
+        }
+        if (updates.getDueDate() != null) {
+            task.setDueDate(updates.getDueDate());
+        }
+        if (updates.getStatus() != null) {
+            task.setStatus(updates.getStatus());
+        }
+        
+        return taskRepository.save(task);
+    }
+
     // GET TASKS BY USER
     public List<Task> getTasksByUser(Long userId) {
         return taskRepository.findByAssignedToId(userId);
