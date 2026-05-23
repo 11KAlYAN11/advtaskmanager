@@ -120,6 +120,13 @@ export const taskAPI = {
       headers: authHeaders(),
     }).then(handleResponse).then(res => res.json()),
 
+  update: (taskId: number, updates: { title?: string; description?: string; priority?: string; dueDate?: string; status?: string }) =>
+    fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify(updates),
+    }).then(handleResponse).then(res => res.json()),
+
   delete: (id: number) =>
     fetch(`${API_BASE_URL}/tasks/${id}`, {
       method: 'DELETE',

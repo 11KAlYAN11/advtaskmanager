@@ -525,7 +525,8 @@ Monitoring
 | File | What to change | When |
 |------|---------------|------|
 | `src/main/resources/application.properties` | `spring.datasource.url`, `spring.datasource.username`, `spring.datasource.password`, `openai.api.key` | Local dev |
-| `.env` (copy from `.env.example`) | `DB_PASSWORD`, `JWT_SECRET`, `OPENAI_API_KEY` | Docker |
+| `.env` (copy from `.env.example`) | `DB_PASSWORD`, `JWT_SECRET`, `OPENAI_API_KEY` | Docker local |
+| `.env.prod` *(never committed)* | All prod secrets — single source of truth for production | Railway / any cloud |
 | `k8s/02-secrets.yaml` | Base64 values for `DB_PASSWORD`, `JWT_SECRET`, `OPENAI_API_KEY` | K8s |
 | `k8s/04-backend.yaml` line 30 | `image: YOUR_REGISTRY/...` → your Docker Hub/ECR image | K8s |
 | `k8s/05-frontend.yaml` line 24 | `image: YOUR_REGISTRY/...` → your Docker Hub/ECR image | K8s |
