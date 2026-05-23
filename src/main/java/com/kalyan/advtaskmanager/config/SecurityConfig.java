@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -30,6 +31,11 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
     private final CustomUserDetailsService userDetailsService;
+
+    // Reads ALLOWED_ORIGINS env var (comma-separated).
+    // Defaults to localhost for local dev. Set to your Vercel URL in Railway.
+    @Value("${ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}")
+    private String allowedOriginsEnv;
 
     public SecurityConfig(JwtAuthenticationFilter jwtFilter,
                           CustomUserDetailsService userDetailsService) {
@@ -95,8 +101,9 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         // Allow ALL origins — safe because JWT handles auth (no session cookies).
-        // To restrict later: set ALLOWED_ORIGINS env var with comma-separated list.
-        config.setAllowedOriginPatterns(List.of("*"));
+        // To restrict: set ALLOWED_ORIGINS env var with comma-separated list in Railway.
+        List<String> origins = List.of(allowedOriginsEnv.split(","));
+        config.setAllowedOriginPatterns(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization"));
