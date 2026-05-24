@@ -4,7 +4,7 @@
   "framework": "vite",
   "build": {
     "env": {
-      "VITE_API_BASE_URL": "http://18.61.92.15:8080/api"
+      "VITE_API_BASE_URL": "https://d4hni3js3y4im.cloudfront.net/api"
     }
   },
   "rewrites": [
