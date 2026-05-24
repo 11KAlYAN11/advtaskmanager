@@ -70,7 +70,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // ── Prometheus / Actuator (from internal network only in prod) ──
-                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
                         .requestMatchers("/actuator/**").hasRole("ADMIN")
                         // ── Public ────────────────────────────────────────
                         .requestMatchers("/api/auth/**").permitAll()
@@ -100,10 +100,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Allow ALL origins — safe because JWT handles auth (no session cookies).
-        // To restrict: set ALLOWED_ORIGINS env var with comma-separated list in Railway.
-        List<String> origins = List.of(allowedOriginsEnv.split(","));
-        config.setAllowedOriginPatterns(origins);
+        // Allow all origins via wildcard — JWT handles auth so this is safe.
+        // CloudFront strips the Origin header so we can't rely on specific-origin matching.
+        config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization"));
