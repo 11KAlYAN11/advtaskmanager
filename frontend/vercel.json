@@ -4,10 +4,11 @@
   "framework": "vite",
   "build": {
     "env": {
-      "VITE_API_BASE_URL": "http://18.61.60.158:8080/api"
+      "VITE_API_BASE_URL": "/api"
     }
   },
   "rewrites": [
+    { "source": "/api/:path*", "destination": "http://18.61.60.158:8080/api/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
