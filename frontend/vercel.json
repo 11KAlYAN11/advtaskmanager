@@ -4,7 +4,7 @@
   "framework": "vite",
   "build": {
     "env": {
-      "VITE_API_BASE_URL": "https://advtaskmanager.onrender.com/api"
+      "VITE_API_BASE_URL": "http://18.61.92.15:8080/api"
     }
   },
   "rewrites": [
