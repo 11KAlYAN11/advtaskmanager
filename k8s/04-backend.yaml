@@ -57,18 +57,26 @@ spec:
               cpu: "1000m"
           readinessProbe:
             httpGet:
-              path: /actuator/health
+              path: /actuator/health/readiness
               port: 8080
-            initialDelaySeconds: 60
-            periodSeconds: 10
+            initialDelaySeconds: 20
+            periodSeconds: 5
             failureThreshold: 3
+            successThreshold: 1
           livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 40
+            periodSeconds: 15
+            failureThreshold: 3
+          startupProbe:
             httpGet:
               path: /actuator/health
               port: 8080
-            initialDelaySeconds: 90
-            periodSeconds: 20
-            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 20   # allows up to 110s total startup time
 ---
 apiVersion: v1
 kind: Service
@@ -94,7 +102,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: backend
-  minReplicas: 2
+  minReplicas: 3         # always keep 3 warm pods — no cold-start under load
   maxReplicas: 10
   metrics:
     - type: Resource
@@ -102,11 +110,39 @@ spec:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 70
+          averageUtilization: 60   # trigger earlier (was 70%)
     - type: Resource
       resource:
         name: memory
         target:
           type: Utilization
-          averageUtilization: 80
-
+          averageUtilization: 75
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0   # scale UP immediately — no waiting
+      policies:
+        - type: Pods
+          value: 4          # can add up to 4 pods at once
+          periodSeconds: 15
+        - type: Percent
+          value: 100        # or double current count, whichever is larger
+          periodSeconds: 15
+      selectPolicy: Max
+    scaleDown:
+      stabilizationWindowSeconds: 300  # wait 5 min before scaling down (avoid thrash)
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+---
+# PodDisruptionBudget — always keep at least 2 pods available during node drain/rollout
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: backend-pdb
+  namespace: taskmanager
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: backend
