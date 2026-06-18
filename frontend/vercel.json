@@ -4,7 +4,8 @@
   "framework": "vite",
   "build": {
     "env": {
-      "VITE_API_BASE_URL": "/api"
+      "VITE_API_BASE_URL": "/api",
+      "VITE_BACKEND_URL": "https://advtaskmanager-production-e645.up.railway.app"
     }
   },
   "rewrites": [
