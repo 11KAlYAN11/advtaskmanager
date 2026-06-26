@@ -69,6 +69,8 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // ── Allow all CORS preflight requests ─────────────────
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // ── Prometheus / Actuator (from internal network only in prod) ──
                         .requestMatchers("/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
                         .requestMatchers("/actuator/**").hasRole("ADMIN")
